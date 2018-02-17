@@ -25,9 +25,7 @@
             android:name=".AddIncome"
             android:label="@string/title_activity_add_income"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".MainMenuActivity">
-
-        </activity>
+        <activity android:name=".MainMenuActivity"></activity>
         <activity android:name=".AddOutlay" />
         <activity
             android:name=".OutlayList"
@@ -43,9 +41,14 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".balance"
+            android:label="@string/title_activity_balance"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

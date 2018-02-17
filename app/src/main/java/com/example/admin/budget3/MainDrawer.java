@@ -216,7 +216,8 @@ public class MainDrawer extends AppCompatActivity
         }
         else if (id == R.id.balance)
         {
-            //TODO: balance
+            Intent intent = new Intent(MainDrawer.this, balance.class);
+            startActivity(intent);
         }
         else if (id == R.id.shoppingLists)
         {
