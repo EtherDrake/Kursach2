@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/outlays"
+            android:icon="@drawable/ic_outlay"
+            android:title="Витрати" />
+        <item
+            android:id="@+id/incomes"
+            android:icon="@drawable/ic_income"
+            android:title="Доходи" />
+        <item
+            android:id="@+id/balance"
+            android:icon="@drawable/ic_balance"
+            android:title="Баланс" />
+        <item
+            android:id="@+id/shoppingLists"
+            android:icon="@drawable/ic_shopping_list"
+            android:title="Списки покупок" />
+    </group>
+
+    <item android:title="Категорії">
+        <menu>
+            <item
+                android:id="@+id/outlayCategories"
+                android:icon="@drawable/ic_menu_gallery"
+                android:title="Категорії витрат" />
+            <item
+                android:id="@+id/incomeCategories"
+                android:icon="@drawable/ic_menu_gallery"
+                android:title="Категорії доходів" />
+        </menu>
+    </item>
+
+</menu>
