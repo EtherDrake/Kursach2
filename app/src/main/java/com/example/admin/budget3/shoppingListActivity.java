@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.io.FileInputStream;
@@ -87,6 +88,7 @@ public class shoppingListActivity extends AppCompatActivity {
              if(!Objects.equals(name, ""))
              {
                  Product product = new Product(name);
+                 product.category=user.categoriesOutlay.get(3);
                  list.products.add(product);
                  refreshListView();
              }
@@ -112,7 +114,7 @@ public class shoppingListActivity extends AppCompatActivity {
                     {
                         for(int i=0;i<list.products.size();i++)
                         {
-                            balanceAction outlay=new balanceAction(user.categoriesOutlay.get(3),new Date(),-1*list.products.get(i).price*list.products.get(i).quantity, list.products.get(i).Name);
+                            balanceAction outlay=new balanceAction(list.products.get(i).category,new Date(),-1*list.products.get(i).price*list.products.get(i).quantity, list.products.get(i).Name);
                             user.balanceActions.add(outlay);
                         }
                         user.shoppingLists.remove(index);
@@ -157,10 +159,18 @@ public class shoppingListActivity extends AppCompatActivity {
                 final EditText nameInput = textEntryView.findViewById(R.id.editText12);
                 final EditText priceInput = textEntryView.findViewById(R.id.editText14);
                 final EditText quantityInput = textEntryView.findViewById(R.id.editText13);
+                final Spinner spinner = textEntryView.findViewById(R.id.spinner5);
 
                 nameInput.setText(String.valueOf(list.products.get(position).Name));
                 priceInput.setText(String.valueOf(list.products.get(position).price));
                 quantityInput.setText(String.valueOf((int)list.products.get(position).quantity));
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(shoppingListActivity.this,
+                        android.R.layout.simple_spinner_item, user.categoriesOutlay);
+
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinner.setAdapter(adapter);
+                spinner.setSelection(user.categoriesOutlay.indexOf(list.products.get(position).category));
 
 
                 final AlertDialog.Builder alert = new AlertDialog.Builder(shoppingListActivity.this);
@@ -181,6 +191,7 @@ public class shoppingListActivity extends AppCompatActivity {
                                     toChange.quantity=quantity;
                                     toChange.price=price;
                                     toChange.Name=name;
+                                    toChange.category=user.categoriesOutlay.get(spinner.getSelectedItemPosition());
 
                                     list.products.set(position,toChange);
                                     Methods.save(user, shoppingListActivity.this);
