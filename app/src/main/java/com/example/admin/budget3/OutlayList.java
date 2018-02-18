@@ -247,7 +247,7 @@ public class OutlayList extends AppCompatActivity {
                 {
                     if (Objects.equals(user.balanceActions.get(i).category, category)) {
                         balanceAction action=user.balanceActions.get(i);
-                        listToShow.add((action.date.getDate())+"/"+(action.date.getMonth()+1)+"/"+(action.date.getYear()+1900)+":"+user.balanceActions.get(i).info+"("+format.format(Math.abs(user.balanceActions.get(i).amount))+"₴)");
+                        listToShow.add(Methods.formatDate(action.date)+":"+user.balanceActions.get(i).info+"("+format.format(Math.abs(user.balanceActions.get(i).amount))+"₴)");
                     }
                 }
             }
@@ -259,7 +259,7 @@ public class OutlayList extends AppCompatActivity {
                 {
                     if (Objects.equals(user.balanceActions.get(i).category, category)) {
                         balanceAction action=user.balanceActions.get(i);
-                        listToShow.add((action.date.getDate())+"/"+(action.date.getMonth()+1)+"/"+(action.date.getYear()+1900)+":"+user.balanceActions.get(i).info+"("+user.balanceActions.get(i).amount+"₴)");
+                        listToShow.add(Methods.formatDate(action.date)+":"+user.balanceActions.get(i).info+"("+user.balanceActions.get(i).amount+"₴)");
                     }
                 }
             }

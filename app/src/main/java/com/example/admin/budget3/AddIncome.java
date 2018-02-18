@@ -66,7 +66,8 @@ public class AddIncome extends AppCompatActivity {
 
         if(index==-1)incomeDate=new Date();
         else incomeDate=user.balanceActions.get(index).date;
-        dateOutput.setText(incomeDate.getYear()+1900+"/"+incomeDate.getMonth()+1+"/"+incomeDate.getDate());
+        //dateOutput.setText(incomeDate.getYear()+1900+"/"+incomeDate.getMonth()+1+"/"+incomeDate.getDate());
+        dateOutput.setText(Methods.formatDate(incomeDate));
 
         if(index!=-1)
         {
@@ -132,7 +133,7 @@ public class AddIncome extends AppCompatActivity {
             Log.d("Year",String.valueOf(incomeDate.getYear()));
             Log.d("Month",String.valueOf(incomeDate.getMonth()));
             Log.d("Day",String.valueOf(incomeDate.getDate()));
-            dateOutput.setText(year+"/"+Integer.valueOf(monthOfYear+1)+"/"+dayOfMonth);
+            dateOutput.setText(dayOfMonth+"/"+Integer.valueOf(monthOfYear+1)+"/"+year);
         }
     };
 

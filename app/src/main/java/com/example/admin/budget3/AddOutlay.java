@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.lang.reflect.Method;
 import java.util.Date;
 
 import Classes.Methods;
@@ -57,7 +58,8 @@ public class AddOutlay extends AppCompatActivity {
 
         if(index==-1)outlayDate=new Date();
         else outlayDate=user.balanceActions.get(index).date;
-        dateOutput.setText(outlayDate.getYear()+1900+"/"+outlayDate.getMonth()+1+"/"+outlayDate.getDate());
+        //dateOutput.setText(outlayDate.getYear()+1900+"/"+outlayDate.getMonth()+1+"/"+outlayDate.getDate());
+        dateOutput.setText(Methods.formatDate(outlayDate));
 
 
         if(index!=-1)
@@ -127,7 +129,7 @@ public class AddOutlay extends AppCompatActivity {
             Log.d("Year",String.valueOf(outlayDate.getYear()));
             Log.d("Month",String.valueOf(outlayDate.getMonth()));
             Log.d("Day",String.valueOf(outlayDate.getDate()));
-            dateOutput.setText(year+"/"+Integer.valueOf(monthOfYear+1)+"/"+dayOfMonth);
+            dateOutput.setText(dayOfMonth+"/"+Integer.valueOf(monthOfYear+1)+"/"+year);
         }
     };
 

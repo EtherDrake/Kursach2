@@ -73,7 +73,7 @@ public class shoppingListActivity extends AppCompatActivity {
         {
             list=new ShoppingList();
             Date tmpDate=new Date();
-            list.name=tmpDate.getDate()+"/"+(tmpDate.getMonth()+1)+"/"+(tmpDate.getYear()+1900);
+            list.name=Methods.formatDate(tmpDate);
         }
         else
         {
