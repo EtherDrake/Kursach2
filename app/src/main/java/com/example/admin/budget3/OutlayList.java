@@ -59,78 +59,6 @@ public class OutlayList extends AppCompatActivity {
         }
 
         refreshListView(1);
-
-        /*ArrayList<String> listToShow=new ArrayList<>();
-        for(int i=0;i<list.size();i++)
-        {
-            listToShow.add(list.get(i).amount+"₴ ("+(list.get(i).date.getYear()+1900)+"/"+(list.get(i).date.getMonth()+1)+"/"+list.get(i).date.getDate()+")");
-        }
-
-        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listToShow);
-        listView.setAdapter(adapter);
-
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-
-                final balanceAction action=list.get(position);
-                LayoutInflater factory = LayoutInflater.from(OutlayList.this);
-
-                final View textEntryView = factory.inflate(R.layout.changeoutlay, null);
-
-                final EditText infoInput = textEntryView.findViewById(R.id.editText15);
-                final EditText amountInput = textEntryView.findViewById(R.id.editText9);
-                final Spinner categoryInput = textEntryView.findViewById(R.id.spinner3);
-
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(OutlayList.this,
-                        android.R.layout.simple_spinner_item, user.categoriesOutlay);
-
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-
-                int pos=user.categoriesOutlay.indexOf(action.category);
-
-                infoInput.setText(action.info);
-                amountInput.setText(String.valueOf(action.amount));
-                categoryInput.setAdapter(adapter);
-                categoryInput.setSelection(pos);
-
-                final AlertDialog.Builder alert = new AlertDialog.Builder(OutlayList.this);
-                alert.setTitle(
-                        "Enter the values:").setView(
-                        textEntryView).setPositiveButton("Save",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                //Log.i("AlertDialog","TextEntry 1 Entered "+priceInput.getText().toString());
-                                //Log.i("AlertDialog","TextEntry 2 Entered "+quantityInput.getText().toString());
-                                if(!Objects.equals(infoInput.getText().toString(), "") && !Objects.equals(amountInput.getText().toString(), ""))
-                                {
-                                    String info=infoInput.getText().toString();
-                                    double price=Double.valueOf(amountInput.getText().toString());
-                                    String category=categoryInput.getSelectedItem().toString();
-
-                                    action.info=info;
-                                    action.amount=price;
-                                    action.category=category;
-
-                                    list.set(position,action);
-                                    user.balanceActions.set(position,action);
-                                    Methods.save(user, OutlayList.this);
-                                    refreshListView();
-                                }
-                            }
-                        }).setNegativeButton("Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                 *//*
-                                 * User clicked cancel so do some stuff
-                                 *//*
-                            }
-                        });
-                alert.show();
-                return true;
-            }
-        });*/
     }
 
     public void refreshListView()
@@ -148,9 +76,9 @@ public class OutlayList extends AppCompatActivity {
 
     public void refreshListView(int pType)
     {
-
             listView.setAdapter(null);
             ArrayList<String> listToShow = new ArrayList<>();
+            final ArrayList<Integer> indexes=new ArrayList<>();
             double[] sums;
             if(type==0)
             {
@@ -165,10 +93,6 @@ public class OutlayList extends AppCompatActivity {
                                 sums[index] += Math.abs(user.balanceActions.get(j).amount);
                             }
                         }
-
-                        //ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listToShow);
-                        //listView.setAdapter(adapter);
-
                         break;
                     }
 
@@ -241,6 +165,7 @@ public class OutlayList extends AppCompatActivity {
             }
             else if(type==2)
             {
+                indexes.clear();
                 String category=getIntent().getStringExtra("cat");
                 NumberFormat format = new DecimalFormat("##.##");
                 for (int i = 0; i < user.balanceActions.size(); i++)
@@ -248,20 +173,141 @@ public class OutlayList extends AppCompatActivity {
                     if (Objects.equals(user.balanceActions.get(i).category, category)) {
                         balanceAction action=user.balanceActions.get(i);
                         listToShow.add(Methods.formatDate(action.date)+":"+user.balanceActions.get(i).info+"("+format.format(Math.abs(user.balanceActions.get(i).amount))+"₴)");
+                        indexes.add(i);
                     }
                 }
+
+                listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                    @Override
+                    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                        LayoutInflater factory = LayoutInflater.from(OutlayList.this);
+
+                        final View textEntryView = factory.inflate(R.layout.changeoutlay, null);
+
+                        final EditText priceInput = textEntryView.findViewById(R.id.editText9);
+                        final EditText infoInput = textEntryView.findViewById(R.id.editText15);
+                        final Spinner spinner = textEntryView.findViewById(R.id.spinner3);
+
+                        priceInput.setText(String.valueOf(Math.abs(list.get(indexes.get(position)).amount)));
+                        infoInput.setText(list.get(indexes.get(position)).info);
+
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(OutlayList.this,
+                                android.R.layout.simple_spinner_item, user.categoriesOutlay);
+
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        spinner.setAdapter(adapter);
+                        spinner.setSelection(user.categoriesOutlay.indexOf(list.get(indexes.get(position)).category));
+
+
+                        final AlertDialog.Builder alert = new AlertDialog.Builder(OutlayList.this);
+                        alert.setTitle(
+                                "Редагувати").setView(
+                                textEntryView).setPositiveButton("Зберегти",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        if(!Objects.equals(priceInput.getText().toString(), ""))
+                                        {
+                                            double price=-1*Double.valueOf(priceInput.getText().toString());
+                                            String info=infoInput.getText().toString();
+
+                                            balanceAction toChange=list.get(indexes.get(position));
+                                            toChange.amount=price;
+                                            toChange.info=info;
+                                            toChange.category=user.categoriesOutlay.get(spinner.getSelectedItemPosition());
+
+                                            list.set(indexes.get(position),toChange);
+                                            Methods.save(user, OutlayList.this);
+                                            refreshListView(1);
+                                        }
+                                    }
+                                }).setNegativeButton("Видалити",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        list.remove((int)indexes.get(position));
+                                        Methods.save(user, OutlayList.this);
+                                        refreshListView(1);
+                                    }
+                                });
+                        alert.show();
+                        return true;
+                    }
+                });
+
             }
 
             else if(type==3)
             {
+                indexes.clear();
                 String category=getIntent().getStringExtra("cat");
+                NumberFormat format = new DecimalFormat("##.##");
                 for (int i = 0; i < user.balanceActions.size(); i++)
                 {
                     if (Objects.equals(user.balanceActions.get(i).category, category)) {
                         balanceAction action=user.balanceActions.get(i);
-                        listToShow.add(Methods.formatDate(action.date)+":"+user.balanceActions.get(i).info+"("+user.balanceActions.get(i).amount+"₴)");
+                        listToShow.add(Methods.formatDate(action.date)+":"+user.balanceActions.get(i).info+"("+format.format(Math.abs(user.balanceActions.get(i).amount))+"₴)");
+                        indexes.add(i);
+                        Log.d("asd", String.valueOf(i));
                     }
                 }
+
+                listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                    @Override
+                    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                        LayoutInflater factory = LayoutInflater.from(OutlayList.this);
+
+                        final View textEntryView = factory.inflate(R.layout.changeoutlay, null);
+
+                        final EditText priceInput = textEntryView.findViewById(R.id.editText9);
+                        final EditText infoInput = textEntryView.findViewById(R.id.editText15);
+                        final Spinner spinner = textEntryView.findViewById(R.id.spinner3);
+
+                        priceInput.setText(String.valueOf(list.get(indexes.get(position)).amount));
+                        infoInput.setText(list.get(indexes.get(position)).info);
+
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(OutlayList.this,
+                                android.R.layout.simple_spinner_item, user.categoriesIncome);
+
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        spinner.setAdapter(adapter);
+                        spinner.setSelection(user.categoriesIncome.indexOf(list.get(indexes.get(position)).category));
+                        //Log.d("asd", String.valueOf(list.get(indexes.get(position)).info));
+
+
+                        final AlertDialog.Builder alert = new AlertDialog.Builder(OutlayList.this);
+                        alert.setTitle(
+                                "Редагувати").setView(
+                                textEntryView).setPositiveButton("Зберегти",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        if(!Objects.equals(priceInput.getText().toString(), ""))
+                                        {
+                                            double price=Double.valueOf(priceInput.getText().toString());
+                                            String info=infoInput.getText().toString();
+
+
+                                            balanceAction toChange=list.get(indexes.get(position));
+                                            toChange.amount=price;
+                                            toChange.info=info;
+                                            toChange.category=user.categoriesIncome.get(spinner.getSelectedItemPosition());
+
+                                            list.set(indexes.get(position),toChange);
+                                            Methods.save(user, OutlayList.this);
+                                            refreshListView(1);
+                                        }
+                                    }
+                                }).setNegativeButton("Видалити",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        list.remove((int)indexes.get(position));
+                                        //user.balanceActions= (ArrayList<balanceAction>) list;
+                                        Methods.save(user, OutlayList.this);
+                                        refreshListView(1);
+                                    }
+                                });
+                        alert.show();
+                        return true;
+                    }
+                });
             }
             ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listToShow);
             listView.setAdapter(adapter);

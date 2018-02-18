@@ -118,7 +118,8 @@ public class MainDrawer extends AppCompatActivity
         //------------------------------------------------------------------------------------------
 
 
-        user=null;
+        refreshMenu();
+        /*user=null;
 
         try
         {
@@ -161,7 +162,62 @@ public class MainDrawer extends AppCompatActivity
         monthlyBalance.setText(String.valueOf(user.getMonthlyBalance()));
         yearlyBalance.setText(String.valueOf(user.getYearlyBalance()));
 
+        toShop.setText(String.valueOf(user.getPlannedShoppings()));*/
+    }
+
+    public void refreshMenu()
+    {
+        user=null;
+
+        try
+        {
+            FileInputStream fis = openFileInput("User");
+            ObjectInputStream is = new ObjectInputStream(fis);
+            try
+            {
+                user = (User) is.readObject();
+            }catch (ClassNotFoundException e) { Log.d("MyLogs",
+                    "File not loaded ClassNotFound"); }
+            is.close();
+            fis.close();
+            Log.d("MyLogs","File loaded");
+        }catch (IOException e){Log.d("MyLogs","File not loaded IOE");}
+
+        if(user==null)
+        {
+            user = new User();
+            try {
+                FileOutputStream fos = openFileOutput("User",
+                        Context.MODE_PRIVATE);
+                ObjectOutputStream os = new ObjectOutputStream(fos);
+                os.writeObject(user);
+                os.close();
+                fos.close();
+                Log.d("MyLogs","File saved");
+            }catch (IOException e){Log.d("MyLogs","File not saved");}
+        }
+
+        dailyIncome.setText(String.valueOf(user.getDailyIncome()));
+        monthlyIncome.setText(String.valueOf(user.getMonthlyIncome()));
+        yearlyIncome.setText(String.valueOf(user.getYearlyIncome()));
+
+        dailyOutlay.setText(String.valueOf(user.getDailyOutlay()));
+        monthlyOutlay.setText(String.valueOf(user.getMonthlyOutlay()));
+        yearlyOutlay.setText(String.valueOf(user.getYearlyOutlay()));
+
+        dailyBalance.setText(String.valueOf(user.getDailyBalance()));
+        monthlyBalance.setText(String.valueOf(user.getMonthlyBalance()));
+        yearlyBalance.setText(String.valueOf(user.getYearlyBalance()));
+
         toShop.setText(String.valueOf(user.getPlannedShoppings()));
+    }
+
+    @Override
+    public void onResume()
+    {  // After a pause OR at startup
+        super.onResume();
+        refreshMenu();
+        //Refresh your stuff here
     }
 
     @Override
