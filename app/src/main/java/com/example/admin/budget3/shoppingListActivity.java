@@ -88,7 +88,7 @@ public class shoppingListActivity extends AppCompatActivity {
              if(!Objects.equals(name, ""))
              {
                  Product product = new Product(name);
-                 product.category=user.categoriesOutlay.get(3);
+                 product.category=user.categoriesOutlay.get(0);
                  list.products.add(product);
                  refreshListView();
              }
@@ -162,8 +162,8 @@ public class shoppingListActivity extends AppCompatActivity {
                 final Spinner spinner = textEntryView.findViewById(R.id.spinner5);
 
                 nameInput.setText(String.valueOf(list.products.get(position).Name));
-                priceInput.setText(String.valueOf(list.products.get(position).price));
-                quantityInput.setText(String.valueOf((int)list.products.get(position).quantity));
+                if(list.products.get(position).price!=0)priceInput.setText(String.valueOf(list.products.get(position).price));
+                if(list.products.get(position).quantity!=0)quantityInput.setText(String.valueOf((int)list.products.get(position).quantity));
 
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(shoppingListActivity.this,
                         android.R.layout.simple_spinner_item, user.categoriesOutlay);
