@@ -219,7 +219,7 @@ public class shoppingListActivity extends AppCompatActivity {
         NumberFormat format = new DecimalFormat("##.###");
         for(int i=0;i<list.products.size();i++)
         {
-            listToShow.add(list.products.get(i).Name+"("+list.products.get(i).price+") - "+format.format(list.products.get(i).quantity));
+            listToShow.add(list.products.get(i).Name+"("+list.products.get(i).price+"₴) - "+format.format(list.products.get(i).quantity));
         }
 
         ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_checked, listToShow);

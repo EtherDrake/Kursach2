@@ -114,6 +114,14 @@ public class MainDrawer extends AppCompatActivity
             }
         });
 
+        openBalance.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainDrawer.this, balance.class);
+                startActivity(intent);
+            }
+        });
+
 
         //------------------------------------------------------------------------------------------
 
