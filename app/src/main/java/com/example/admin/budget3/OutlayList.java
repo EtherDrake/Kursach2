@@ -29,6 +29,8 @@ import Classes.Product;
 import Classes.User;
 import Classes.balanceAction;
 
+import Utility.outlayAdapter;
+
 public class OutlayList extends AppCompatActivity {
 
     ListView listView;
@@ -78,6 +80,7 @@ public class OutlayList extends AppCompatActivity {
     {
             listView.setAdapter(null);
             ArrayList<String> listToShow = new ArrayList<>();
+            ArrayList<balanceAction> listToShow2=new ArrayList<>();
             final ArrayList<Integer> indexes=new ArrayList<>();
             double[] sums;
             if(type==0)
@@ -173,6 +176,7 @@ public class OutlayList extends AppCompatActivity {
                     if (Objects.equals(user.balanceActions.get(i).category, category)) {
                         balanceAction action=user.balanceActions.get(i);
                         listToShow.add(Methods.formatDate(action.date)+":"+user.balanceActions.get(i).info+"("+format.format(Math.abs(user.balanceActions.get(i).amount))+"₴)");
+                        listToShow2.add(user.balanceActions.get(i));
                         indexes.add(i);
                     }
                 }
@@ -232,7 +236,6 @@ public class OutlayList extends AppCompatActivity {
                         return true;
                     }
                 });
-
             }
 
             else if(type==3)
@@ -245,6 +248,7 @@ public class OutlayList extends AppCompatActivity {
                     if (Objects.equals(user.balanceActions.get(i).category, category)) {
                         balanceAction action=user.balanceActions.get(i);
                         listToShow.add(Methods.formatDate(action.date)+":"+user.balanceActions.get(i).info+"("+format.format(Math.abs(user.balanceActions.get(i).amount))+"₴)");
+                        listToShow2.add(user.balanceActions.get(i));
                         indexes.add(i);
                         Log.d("asd", String.valueOf(i));
                     }
@@ -310,7 +314,9 @@ public class OutlayList extends AppCompatActivity {
                 });
             }
             ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listToShow);
-            listView.setAdapter(adapter);
+            outlayAdapter adapter2=new outlayAdapter(this, listToShow2);
+            if(type==0 || type==1) listView.setAdapter(adapter);
+            else listView.setAdapter(adapter2);
 
     }
 
