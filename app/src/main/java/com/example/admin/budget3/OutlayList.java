@@ -288,7 +288,6 @@ public class OutlayList extends AppCompatActivity {
                                             double price=Double.valueOf(priceInput.getText().toString());
                                             String info=infoInput.getText().toString();
 
-
                                             balanceAction toChange=list.get(indexes.get(position));
                                             toChange.amount=price;
                                             toChange.info=info;

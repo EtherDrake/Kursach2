@@ -122,8 +122,6 @@ public class shoppingListActivity extends AppCompatActivity {
                     else user.shoppingLists.set(index,list);
                 }
 
-
-
                 Methods.save(user,shoppingListActivity.this);
 
                 Intent intent = new Intent(shoppingListActivity.this, MainDrawer.class);
