@@ -1,14 +1,20 @@
 package com.example.admin.budget3;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 
 import com.github.mikephil.charting.charts.PieChart;
@@ -30,6 +36,9 @@ public class balance extends AppCompatActivity {
     PieChart pieChart;
     Spinner spinner, spinner2;
     User user;
+    ImageButton calendar;
+    Date today=new Date();
+    int myYear, myMonth, myDay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +53,7 @@ public class balance extends AppCompatActivity {
         pieChart = findViewById(R.id.piechart);
         spinner = findViewById(R.id.spinner4);
         spinner2=findViewById(R.id.spinner6);
+        calendar=findViewById(R.id.imageButton3);
 
         String[] arraySpinner = new String[] {
                 "Витрати", "Доходи"
@@ -84,10 +94,25 @@ public class balance extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
             {
                 setChart(spinner.getSelectedItemPosition() == 1, position);
+                calendar.setEnabled(position!=3);
+                if(position==3) calendar.setVisibility(View.INVISIBLE);
+                else calendar.setVisibility(View.VISIBLE);
             }
             public void onNothingSelected(AdapterView<?> parent)
             {
 
+            }
+        });
+
+        calendar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Date date = new Date();
+                myYear = date.getYear()+1900;
+                myMonth = date.getMonth();
+                myDay = date.getDay();
+                Log.d("Date issue", String.valueOf(date.getYear()));
+                showDialog(1);
             }
         });
 
@@ -96,55 +121,8 @@ public class balance extends AppCompatActivity {
         user= Methods.load(this);
 
         setChart(false,3);
-
-
     }
 
-    public void setChart(boolean type)
-    {
-        double[] sums;
-        if(type) sums=new double[user.categoriesIncome.size()];
-        else sums=new double[user.categoriesOutlay.size()];
-
-        for (int i = 0; i < sums.length; i++) sums[i] = 0;
-
-        for (int j = 0; j < user.balanceActions.size(); j++) {
-            if (user.balanceActions.get(j).amount > 0 && type) {
-                int index = user.categoriesIncome.indexOf(user.balanceActions.get(j).category);
-                sums[index] += Math.abs(user.balanceActions.get(j).amount);
-            }
-            else if(user.balanceActions.get(j).amount < 0 && !type)
-            {
-                int index = user.categoriesOutlay.indexOf(user.balanceActions.get(j).category);
-                sums[index] += Math.abs(user.balanceActions.get(j).amount);
-            }
-        }
-
-        ArrayList<Entry> yvalues = new ArrayList<Entry>();
-        ArrayList<String> xVals = new ArrayList<String>();
-        for(int i=0;i<sums.length; i++)
-        {
-            double value=sums[i];
-            String label;
-            if(type) label=user.categoriesIncome.get(i);
-            else label=user.categoriesOutlay.get(i);
-
-            if(value>0)
-            {
-                yvalues.add(new Entry((float) value, i));
-                xVals.add(label);
-            }
-        }
-
-        PieDataSet dataSet = new PieDataSet(yvalues, "");
-        dataSet.setColors(ColorTemplate.VORDIPLOM_COLORS);
-        PieData data = new PieData(xVals, dataSet);
-        data.setValueFormatter(new PercentFormatter());
-        data.setValueTextSize(16f);
-        pieChart.setData(data);
-        pieChart.setDescription("");
-        pieChart.getLegend().setEnabled(false);
-    }
 
     public void setChart(boolean type, int period)
     {
@@ -153,7 +131,7 @@ public class balance extends AppCompatActivity {
         else sums=new double[user.categoriesOutlay.size()];
 
         for (int i = 0; i < sums.length; i++) sums[i] = 0;
-        Date today=new Date();
+        //Date today=new Date();
 
         switch (period) {
             case 0:
@@ -233,9 +211,30 @@ public class balance extends AppCompatActivity {
         data.setValueFormatter(new PercentFormatter());
         data.setValueTextSize(16f);
         pieChart.setData(data);
-        pieChart.setDescription("");
+        pieChart.setDescription(Methods.formatDate(today));
         pieChart.getLegend().setEnabled(false);
     }
+
+    protected Dialog onCreateDialog(int id)
+    {
+        if (id == 1) {
+            DatePickerDialog tpd = new DatePickerDialog(this, myCallBack, myYear, myMonth, myDay);
+            return tpd;
+        }
+        return super.onCreateDialog(id);
+    }
+
+    DatePickerDialog.OnDateSetListener myCallBack = new DatePickerDialog.OnDateSetListener()
+    {
+        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
+        {
+            today=new Date(year-1900,monthOfYear,dayOfMonth);
+            setChart(spinner.getSelectedItemPosition() == 1, spinner2.getSelectedItemPosition());
+            //outlayDate=new Date();
+            //dateOutput.setText(dayOfMonth+"/"+Integer.valueOf(monthOfYear+1)+"/"+year);
+
+        }
+    };
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
