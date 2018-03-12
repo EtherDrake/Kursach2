@@ -103,7 +103,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
         user=null;
 
-        try
+        /*try
         {
             FileInputStream fis = openFileInput("User");
             ObjectInputStream is = new ObjectInputStream(fis);
@@ -129,7 +129,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 fos.close();
                 Log.d("MyLogs","File saved");
             }catch (IOException e){Log.d("MyLogs","File not saved");}
-        }
+        }*/
 
 
         dailyIncome.setText(String.valueOf(user.getDailyIncome()));

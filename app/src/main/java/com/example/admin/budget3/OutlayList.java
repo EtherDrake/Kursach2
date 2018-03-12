@@ -21,6 +21,7 @@ import android.widget.Spinner;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -51,14 +52,9 @@ public class OutlayList extends AppCompatActivity {
 
         user= Methods.load(this);
         listView=findViewById(R.id.listView4);
-        list=user.balanceActions;
+        list=user.data.balanceActions;
 
         type=getIntent().getIntExtra("type",0);
-
-        for(int i=0;i<user.categoriesOutlay.size();i++)
-        {
-            boolean condition;
-        }
 
         refreshListView(1);
     }
@@ -85,30 +81,22 @@ public class OutlayList extends AppCompatActivity {
             double[] sums;
             if(type==0)
             {
-                sums=new double[user.categoriesOutlay.size()];
+                sums=new double[user.data.categoriesOutlay.size()];
                 switch (pType) {
                     case 1: {
-                        for (int i = 0; i < user.categoriesOutlay.size(); i++) sums[i] = 0;
+                        for (int i = 0; i < user.data.categoriesOutlay.size(); i++) sums[i] = 0;
 
-                        for (int j = 0; j < user.balanceActions.size(); j++) {
-                            if (user.balanceActions.get(j).amount < 0) {
-                                int index = user.categoriesOutlay.indexOf(user.balanceActions.get(j).category);
-                                sums[index] += Math.abs(user.balanceActions.get(j).amount);
+                        for (int j = 0; j < user.data.balanceActions.size(); j++) {
+                            if (user.data.balanceActions.get(j).amount < 0) {
+                                int index = user.data.categoriesOutlay.indexOf(user.data.balanceActions.get(j).category);
+                                sums[index] += Math.abs(user.data.balanceActions.get(j).amount);
                             }
                         }
                         break;
                     }
-
-                    case 2: {
-                        break;
-                    }
-
-                    case 3: {
-                        break;
-                    }
                 }
                 for (int i = 0; i < sums.length; i++)
-                    listToShow.add(user.categoriesOutlay.get(i) + ":" + sums[i] + "₴");
+                    listToShow.add(user.data.categoriesOutlay.get(i) + ":" + sums[i] + "₴");
 
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
@@ -116,7 +104,7 @@ public class OutlayList extends AppCompatActivity {
                         // Get the selected item text from ListView
                         Intent intent = new Intent(OutlayList.this, OutlayList.class);
                         intent.putExtra("type", 2);
-                        intent.putExtra("cat", user.categoriesOutlay.get(position));
+                        intent.putExtra("cat", user.data.categoriesOutlay.get(position));
                         startActivity(intent);
                     }
                 });
@@ -125,34 +113,25 @@ public class OutlayList extends AppCompatActivity {
             }
             else if(type==1)
             {
-                sums=new double[user.categoriesIncome.size()];
+                sums=new double[user.data.categoriesIncome.size()];
                 switch (pType) {
                     case 1: {
-                        for (int i = 0; i < user.categoriesIncome.size(); i++) sums[i] = 0;
+                        for (int i = 0; i < user.data.categoriesIncome.size(); i++) sums[i] = 0;
 
-                        for (int j = 0; j < user.balanceActions.size(); j++) {
-                            if (user.balanceActions.get(j).amount > 0) {
-                                int index = user.categoriesIncome.indexOf(user.balanceActions.get(j).category);
-                                sums[index] += Math.abs(user.balanceActions.get(j).amount);
+                        for (int j = 0; j < user.data.balanceActions.size(); j++) {
+                            if (user.data.balanceActions.get(j).amount > 0) {
+                                int index = user.data.categoriesIncome.indexOf(user.data.balanceActions.get(j).category);
+                                sums[index] += Math.abs(user.data.balanceActions.get(j).amount);
                             }
                         }
 
                         ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listToShow);
                         listView.setAdapter(adapter);
-
-                        break;
-                    }
-
-                    case 2: {
-                        break;
-                    }
-
-                    case 3: {
                         break;
                     }
                 }
                 for (int i = 0; i < sums.length; i++)
-                    listToShow.add(user.categoriesIncome.get(i) + ":" + sums[i] + "₴");
+                    listToShow.add(user.data.categoriesIncome.get(i) + ":" + sums[i] + "₴");
 
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
@@ -160,7 +139,7 @@ public class OutlayList extends AppCompatActivity {
                         // Get the selected item text from ListView
                         Intent intent = new Intent(OutlayList.this, OutlayList.class);
                         intent.putExtra("type", 3);
-                        intent.putExtra("cat", user.categoriesIncome.get(position));
+                        intent.putExtra("cat", user.data.categoriesIncome.get(position));
                         startActivity(intent);
                     }
                 });
@@ -171,12 +150,12 @@ public class OutlayList extends AppCompatActivity {
                 indexes.clear();
                 String category=getIntent().getStringExtra("cat");
                 NumberFormat format = new DecimalFormat("##.##");
-                for (int i = 0; i < user.balanceActions.size(); i++)
+                for (int i = 0; i < user.data.balanceActions.size(); i++)
                 {
-                    if (Objects.equals(user.balanceActions.get(i).category, category)) {
-                        balanceAction action=user.balanceActions.get(i);
-                        listToShow.add(Methods.formatDate(action.date)+":"+user.balanceActions.get(i).info+"("+format.format(Math.abs(user.balanceActions.get(i).amount))+"₴)");
-                        listToShow2.add(user.balanceActions.get(i));
+                    if (Objects.equals(user.data.balanceActions.get(i).category, category)) {
+                        balanceAction action=user.data.balanceActions.get(i);
+                        listToShow.add(Methods.formatDate(action.date)+":"+user.data.balanceActions.get(i).info+"("+format.format(Math.abs(user.data.balanceActions.get(i).amount))+"₴)");
+                        listToShow2.add(user.data.balanceActions.get(i));
                         indexes.add(i);
                     }
                 }
@@ -196,11 +175,11 @@ public class OutlayList extends AppCompatActivity {
                         infoInput.setText(list.get(indexes.get(position)).info);
 
                         ArrayAdapter<String> adapter = new ArrayAdapter<>(OutlayList.this,
-                                android.R.layout.simple_spinner_item, user.categoriesOutlay);
+                                android.R.layout.simple_spinner_item, user.data.categoriesOutlay);
 
                         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         spinner.setAdapter(adapter);
-                        spinner.setSelection(user.categoriesOutlay.indexOf(list.get(indexes.get(position)).category));
+                        spinner.setSelection(user.data.categoriesOutlay.indexOf(list.get(indexes.get(position)).category));
 
 
                         final AlertDialog.Builder alert = new AlertDialog.Builder(OutlayList.this);
@@ -217,7 +196,7 @@ public class OutlayList extends AppCompatActivity {
                                             balanceAction toChange=list.get(indexes.get(position));
                                             toChange.amount=price;
                                             toChange.info=info;
-                                            toChange.category=user.categoriesOutlay.get(spinner.getSelectedItemPosition());
+                                            toChange.category=user.data.categoriesOutlay.get(spinner.getSelectedItemPosition());
 
                                             list.set(indexes.get(position),toChange);
                                             Methods.save(user, OutlayList.this);
@@ -243,12 +222,12 @@ public class OutlayList extends AppCompatActivity {
                 indexes.clear();
                 String category=getIntent().getStringExtra("cat");
                 NumberFormat format = new DecimalFormat("##.##");
-                for (int i = 0; i < user.balanceActions.size(); i++)
+                for (int i = 0; i < user.data.balanceActions.size(); i++)
                 {
-                    if (Objects.equals(user.balanceActions.get(i).category, category)) {
-                        balanceAction action=user.balanceActions.get(i);
-                        listToShow.add(Methods.formatDate(action.date)+":"+user.balanceActions.get(i).info+"("+format.format(Math.abs(user.balanceActions.get(i).amount))+"₴)");
-                        listToShow2.add(user.balanceActions.get(i));
+                    if (Objects.equals(user.data.balanceActions.get(i).category, category)) {
+                        balanceAction action=user.data.balanceActions.get(i);
+                        listToShow.add(Methods.formatDate(action.date)+":"+user.data.balanceActions.get(i).info+"("+format.format(Math.abs(user.data.balanceActions.get(i).amount))+"₴)");
+                        listToShow2.add(user.data.balanceActions.get(i));
                         indexes.add(i);
                         Log.d("asd", String.valueOf(i));
                     }
@@ -269,11 +248,11 @@ public class OutlayList extends AppCompatActivity {
                         infoInput.setText(list.get(indexes.get(position)).info);
 
                         ArrayAdapter<String> adapter = new ArrayAdapter<>(OutlayList.this,
-                                android.R.layout.simple_spinner_item, user.categoriesIncome);
+                                android.R.layout.simple_spinner_item, user.data.categoriesIncome);
 
                         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         spinner.setAdapter(adapter);
-                        spinner.setSelection(user.categoriesIncome.indexOf(list.get(indexes.get(position)).category));
+                        spinner.setSelection(user.data.categoriesIncome.indexOf(list.get(indexes.get(position)).category));
                         //Log.d("asd", String.valueOf(list.get(indexes.get(position)).info));
 
 
@@ -291,7 +270,8 @@ public class OutlayList extends AppCompatActivity {
                                             balanceAction toChange=list.get(indexes.get(position));
                                             toChange.amount=price;
                                             toChange.info=info;
-                                            toChange.category=user.categoriesIncome.get(spinner.getSelectedItemPosition());
+                                            toChange.category=user.data.categoriesIncome.get(spinner.getSelectedItemPosition());
+                                            toChange.updatedAt=new Date();
 
                                             list.set(indexes.get(position),toChange);
                                             Methods.save(user, OutlayList.this);

@@ -17,6 +17,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.gson.Gson;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -24,7 +33,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import Classes.Methods;
 import Classes.User;
+import Classes.UserData;
+import cz.msebera.android.httpclient.Header;
+
 
 public class MainDrawer extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -55,8 +68,6 @@ public class MainDrawer extends AppCompatActivity
         addOutlay=findViewById(R.id.button6);
         openBalance=findViewById(R.id.button7);
         openShoppingLists=findViewById(R.id.button8);
-        //addCategoryOutlay=findViewById(R.id.button13);
-        //addCategoryIncome=findViewById(R.id.button14);
 
         dailyIncome=findViewById(R.id.textView7);
         monthlyIncome=findViewById(R.id.textView5);
@@ -88,24 +99,6 @@ public class MainDrawer extends AppCompatActivity
             }
         });
 
-        /*addCategoryOutlay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainDrawer.this, categoriesList.class);
-                intent.putExtra("type", 1);
-                startActivity(intent);
-            }
-        });
-
-        addCategoryIncome.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainDrawer.this, categoriesList.class);
-                intent.putExtra("type", 0);
-                startActivity(intent);
-            }
-        });*/
-
         openShoppingLists.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -121,89 +114,15 @@ public class MainDrawer extends AppCompatActivity
                 startActivity(intent);
             }
         });
-
-
-        //------------------------------------------------------------------------------------------
-
-
         refreshMenu();
-        /*user=null;
-
-        try
-        {
-            FileInputStream fis = openFileInput("User");
-            ObjectInputStream is = new ObjectInputStream(fis);
-            try
-            {
-                user = (User) is.readObject();
-            }catch (ClassNotFoundException e) { Log.d("MyLogs",
-                    "File not loaded ClassNotFound"); }
-            is.close();
-            fis.close();
-            Log.d("MyLogs","File loaded");
-        }catch (IOException e){Log.d("MyLogs","File not loaded IOE");}
-
-        if(user==null)
-        {
-            user = new User();
-            try {
-                FileOutputStream fos = openFileOutput("User",
-                        Context.MODE_PRIVATE);
-                ObjectOutputStream os = new ObjectOutputStream(fos);
-                os.writeObject(user);
-                os.close();
-                fos.close();
-                Log.d("MyLogs","File saved");
-            }catch (IOException e){Log.d("MyLogs","File not saved");}
-        }
-
-
-        dailyIncome.setText(String.valueOf(user.getDailyIncome()));
-        monthlyIncome.setText(String.valueOf(user.getMonthlyIncome()));
-        yearlyIncome.setText(String.valueOf(user.getYearlyIncome()));
-
-        dailyOutlay.setText(String.valueOf(user.getDailyOutlay()));
-        monthlyOutlay.setText(String.valueOf(user.getMonthlyOutlay()));
-        yearlyOutlay.setText(String.valueOf(user.getYearlyOutlay()));
-
-        dailyBalance.setText(String.valueOf(user.getDailyBalance()));
-        monthlyBalance.setText(String.valueOf(user.getMonthlyBalance()));
-        yearlyBalance.setText(String.valueOf(user.getYearlyBalance()));
-
-        toShop.setText(String.valueOf(user.getPlannedShoppings()));*/
     }
 
     public void refreshMenu()
     {
-        user=null;
 
-        try
-        {
-            FileInputStream fis = openFileInput("User");
-            ObjectInputStream is = new ObjectInputStream(fis);
-            try
-            {
-                user = (User) is.readObject();
-            }catch (ClassNotFoundException e) { Log.d("MyLogs",
-                    "File not loaded ClassNotFound"); }
-            is.close();
-            fis.close();
-            Log.d("MyLogs","File loaded");
-        }catch (IOException e){Log.d("MyLogs","File not loaded IOE");}
+        user=Methods.load(MainDrawer.this);
+        Log.d("MainDrawerID",user.ID);
 
-        if(user==null)
-        {
-            user = new User();
-            try {
-                FileOutputStream fos = openFileOutput("User",
-                        Context.MODE_PRIVATE);
-                ObjectOutputStream os = new ObjectOutputStream(fos);
-                os.writeObject(user);
-                os.close();
-                fos.close();
-                Log.d("MyLogs","File saved");
-            }catch (IOException e){Log.d("MyLogs","File not saved");}
-        }
 
         dailyIncome.setText(String.valueOf(user.getDailyIncome()));
         monthlyIncome.setText(String.valueOf(user.getMonthlyIncome()));
@@ -222,10 +141,9 @@ public class MainDrawer extends AppCompatActivity
 
     @Override
     public void onResume()
-    {  // After a pause OR at startup
+    {
         super.onResume();
         refreshMenu();
-        //Refresh your stuff here
     }
 
     @Override
@@ -247,12 +165,7 @@ public class MainDrawer extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
@@ -299,6 +212,73 @@ public class MainDrawer extends AppCompatActivity
             Intent intent = new Intent(MainDrawer.this, categoriesList.class);
             intent.putExtra("type", 1);
             startActivity(intent);
+        }
+        else if (id == R.id.synchronise)
+        {
+            final User toSync= Methods.load(MainDrawer.this);
+            Log.d("user",toSync.ID);
+
+            final AsyncHttpClient client = new AsyncHttpClient();
+            String url="https://balance-rest.herokuapp.com/api/users/"+toSync.ID;
+
+
+            client.get(url, new JsonHttpResponseHandler()
+            {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    try {
+                        Log.d("connection",response.toString());
+
+                        String id=response.getString("_id");
+                        String Email=response.getString("email");
+                        String Password=response.getString("password");
+
+                        String rawData= response.getString("data");
+                        Gson gson = new Gson();
+                        UserData data = gson.fromJson(rawData, UserData.class);
+
+
+
+                        User fromBase =new User(id,Email,Password,data);
+                        User fusion=new User(toSync.ID,toSync.email,toSync.password);
+
+                        Log.d("fromBaseId",id);
+                        Log.d("fromBaseEmail",Email);
+                        Log.d("fromBasePassword",Password);
+                        Log.d("fromBaseRetrievedData",data.categoriesOutlay.get(0));
+
+                        fusion.ID=toSync.ID;
+                        fusion.email=toSync.email;
+                        fusion.password=toSync.password;
+
+                        fusion.data.balanceActions=Methods.fuseActions(toSync.data.balanceActions, fromBase.data.balanceActions);
+                        fusion.data.shoppingLists=Methods.fuseLists(toSync.data.shoppingLists, fromBase.data.shoppingLists);
+                        fusion.data.categoriesOutlay=Methods.fuseStringLists(toSync.data.categoriesOutlay, fromBase.data.categoriesOutlay);
+                        fusion.data.categoriesIncome=Methods.fuseStringLists(toSync.data.categoriesIncome, fromBase.data.categoriesIncome);
+
+                        Methods.updateUser(fusion);
+
+                        Methods.save(fusion,MainDrawer.this);
+
+                        refreshMenu();
+
+                        Toast toast = Toast.makeText(getApplicationContext(),
+                                "Ви успішно синхронізували свої дані", Toast.LENGTH_SHORT);
+                        toast.show();
+
+                    } catch (Exception e) { e.printStackTrace(); }
+                }
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+
+                }
+            });
+         }
+        else if (id == R.id.logOut)
+        {
+            deleteFile("User");
+            finish();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

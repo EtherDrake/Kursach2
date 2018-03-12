@@ -44,7 +44,6 @@ public class AddOutlay extends AppCompatActivity {
 
         OK_BUTTON = findViewById(R.id.button9);
         changeDateButton = findViewById(R.id.button10);
-        //testButton=findViewById(R.id.button13);
 
         SUM = findViewById(R.id.editText11);
         INFO = findViewById(R.id.editText12);
@@ -57,24 +56,22 @@ public class AddOutlay extends AppCompatActivity {
         user= Methods.load(this);
 
         if(index==-1)outlayDate=new Date();
-        else outlayDate=user.balanceActions.get(index).date;
-        //dateOutput.setText(outlayDate.getYear()+1900+"/"+outlayDate.getMonth()+1+"/"+outlayDate.getDate());
+        else outlayDate=user.data.balanceActions.get(index).date;
         dateOutput.setText(Methods.formatDate(outlayDate));
 
 
         if(index!=-1)
         {
-            SUM.setText(String.valueOf(user.balanceActions.get(index).amount));
-            INFO.setText(user.balanceActions.get(index).info);
+            SUM.setText(String.valueOf(user.data.balanceActions.get(index).amount));
+            INFO.setText(user.data.balanceActions.get(index).info);
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, user.categoriesOutlay);
+                android.R.layout.simple_spinner_item, user.data.categoriesOutlay);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCATEGORY.setAdapter(adapter);
         spinnerCATEGORY.setSelection(0);
-        //spinnerCATEGORY.getSelectedItem().toString();
 
         changeDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,14 +92,11 @@ public class AddOutlay extends AppCompatActivity {
                         outlayDate, -1*Double.parseDouble(SUM.getText().toString()),
                         INFO.getText().toString());
 
-                if(index==-1)user.balanceActions.add(outlay);
-                else user.balanceActions.set(index, outlay);
+                outlay.updatedAt=new Date();
 
-                Log.d("Date",String.valueOf(outlay.date));
-
+                if(index==-1)user.data.balanceActions.add(outlay);
+                else user.data.balanceActions.set(index, outlay);
                 Methods.save(user,AddOutlay.this);
-
-
                 Intent intent = new Intent(AddOutlay.this, MainDrawer.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
@@ -125,7 +119,6 @@ public class AddOutlay extends AppCompatActivity {
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
         {
             outlayDate=new Date(year-1900,monthOfYear,dayOfMonth);
-            //outlayDate=new Date();
             Log.d("Year",String.valueOf(outlayDate.getYear()));
             Log.d("Month",String.valueOf(outlayDate.getMonth()));
             Log.d("Day",String.valueOf(outlayDate.getDate()));
@@ -137,7 +130,7 @@ public class AddOutlay extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // handle arrow click here
         if (item.getItemId() == android.R.id.home) {
-            finish(); // close this activity and return to preview activity (if there is any)
+            finish();
         }
 
         return super.onOptionsItemSelected(item);

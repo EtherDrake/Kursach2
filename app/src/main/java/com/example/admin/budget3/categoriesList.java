@@ -38,8 +38,8 @@ public class categoriesList extends AppCompatActivity {
 
         user= Methods.load(this);
 
-        if(type==0) list=user.categoriesIncome;
-        else list=user.categoriesOutlay;
+        if(type==0) list=user.data.categoriesIncome;
+        else list=user.data.categoriesOutlay;
 
         ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, list);
         listView.setAdapter(adapter);
@@ -51,8 +51,8 @@ public class categoriesList extends AppCompatActivity {
                 {
                     String category=inputField.getText().toString();
 
-                    if (type == 0)user.categoriesIncome.add(category);
-                    else user.categoriesOutlay.add(category);
+                    if (type == 0)user.data.categoriesIncome.add(category);
+                    else user.data.categoriesOutlay.add(category);
 
                     Methods.save(user,categoriesList.this);
 

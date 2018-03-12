@@ -77,7 +77,7 @@ public class shoppingListActivity extends AppCompatActivity {
         }
         else
         {
-            list=user.shoppingLists.get(index);
+            list=user.data.shoppingLists.get(index);
             refreshListView();
         }
 
@@ -88,7 +88,7 @@ public class shoppingListActivity extends AppCompatActivity {
              if(!Objects.equals(name, ""))
              {
                  Product product = new Product(name);
-                 product.category=user.categoriesOutlay.get(0);
+                 product.category=user.data.categoriesOutlay.get(0);
                  list.products.add(product);
                  refreshListView();
              }
@@ -99,7 +99,8 @@ public class shoppingListActivity extends AppCompatActivity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(index==-1) user.shoppingLists.add(list);
+                list.updatedAt=new Date();
+                if(index==-1) user.data.shoppingLists.add(list);
                 else
                 {
                     boolean isCompleted=true;
@@ -115,12 +116,14 @@ public class shoppingListActivity extends AppCompatActivity {
                         for(int i=0;i<list.products.size();i++)
                         {
                             balanceAction outlay=new balanceAction(list.products.get(i).category,new Date(),-1*list.products.get(i).price*list.products.get(i).quantity, list.products.get(i).Name);
-                            user.balanceActions.add(outlay);
+                            outlay.updatedAt=new Date();
+                            user.data.balanceActions.add(outlay);
                         }
-                        user.shoppingLists.remove(index);
+                        user.data.shoppingLists.remove(index);
                     }
-                    else user.shoppingLists.set(index,list);
+                    else user.data.shoppingLists.set(index,list);
                 }
+
 
                 Methods.save(user,shoppingListActivity.this);
 
@@ -137,13 +140,9 @@ public class shoppingListActivity extends AppCompatActivity {
                 Product pr=list.products.get(position);
                 pr.bought=!pr.bought;
                 list.products.set(position, pr);
+                list.updatedAt=new Date();
                 Methods.save(user, shoppingListActivity.this);
                 refreshListView();
-                //refreshListView();
-                // Get the selected item text from ListView
-                //Intent intent = new Intent(shoppingListsList.this, shoppingListActivity.class);
-                //intent.putExtra("index", position);
-                //startActivity(intent);
             }
         });
 
@@ -164,21 +163,19 @@ public class shoppingListActivity extends AppCompatActivity {
                 if(list.products.get(position).quantity!=0)quantityInput.setText(String.valueOf((int)list.products.get(position).quantity));
 
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(shoppingListActivity.this,
-                        android.R.layout.simple_spinner_item, user.categoriesOutlay);
+                        android.R.layout.simple_spinner_item, user.data.categoriesOutlay);
 
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(adapter);
-                spinner.setSelection(user.categoriesOutlay.indexOf(list.products.get(position).category));
+                spinner.setSelection(user.data.categoriesOutlay.indexOf(list.products.get(position).category));
 
 
                 final AlertDialog.Builder alert = new AlertDialog.Builder(shoppingListActivity.this);
                 alert.setTitle(
-                        "Enter the values:").setView(
-                        textEntryView).setPositiveButton("Save",
+                        "Введіть дані:").setView(
+                        textEntryView).setPositiveButton("Зберегти",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                Log.i("AlertDialog","TextEntry 1 Entered "+priceInput.getText().toString());
-                                Log.i("AlertDialog","TextEntry 2 Entered "+quantityInput.getText().toString());
                                 if(!Objects.equals(priceInput.getText().toString(), "") && !Objects.equals(quantityInput.getText().toString(), ""))
                                 {
                                     String name=nameInput.getText().toString();
@@ -189,19 +186,21 @@ public class shoppingListActivity extends AppCompatActivity {
                                     toChange.quantity=quantity;
                                     toChange.price=price;
                                     toChange.Name=name;
-                                    toChange.category=user.categoriesOutlay.get(spinner.getSelectedItemPosition());
+                                    toChange.category=user.data.categoriesOutlay.get(spinner.getSelectedItemPosition());
 
                                     list.products.set(position,toChange);
+                                    list.updatedAt=new Date();
                                     Methods.save(user, shoppingListActivity.this);
                                     refreshListView();
                                 }
                             }
-                        }).setNegativeButton("Cancel",
+                        }).setNegativeButton("Видалити",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                 /*
-                                 * User clicked cancel so do some stuff
-                                 */
+                                list.products.remove(position);
+                                list.updatedAt=new Date();
+                                Methods.save(user, shoppingListActivity.this);
+                                refreshListView();
                             }
                         });
                 alert.show();
@@ -238,5 +237,4 @@ public class shoppingListActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
 }

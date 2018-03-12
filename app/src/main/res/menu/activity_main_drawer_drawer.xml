@@ -35,4 +35,17 @@
         </menu>
     </item>
 
+    <item android:title="Синхронізація">
+        <menu>
+            <item
+                android:id="@+id/synchronise"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Синхронізувати" />
+            <item
+                android:id="@+id/logOut"
+                android:icon="@drawable/ic_menu_manage"
+                android:title="Вийти" />
+        </menu>
+    </item>
+
 </menu>

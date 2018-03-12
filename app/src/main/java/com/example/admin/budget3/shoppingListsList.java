@@ -36,7 +36,7 @@ public class shoppingListsList extends AppCompatActivity {
 
         user= Methods.load(this);
 
-        ArrayList<ShoppingList> list=user.shoppingLists;
+        ArrayList<ShoppingList> list=user.data.shoppingLists;
         List<String> listToShow=new ArrayList<>();
 
         for(int i=0;i<list.size();i++)
@@ -50,7 +50,6 @@ public class shoppingListsList extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Get the selected item text from ListView
                 Intent intent = new Intent(shoppingListsList.this, shoppingListActivity.class);
                 intent.putExtra("index", position);
                 startActivity(intent);
@@ -63,9 +62,6 @@ public class shoppingListsList extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(shoppingListsList.this, shoppingListActivity.class);
-                //EditText editText = (EditText) findViewById(R.id.editText);
-                //String message = editText.getText().toString();
-                //intent.putExtra(EXTRA_MESSAGE, message);
                 startActivity(intent);
             }
         });
@@ -73,9 +69,8 @@ public class shoppingListsList extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // handle arrow click here
         if (item.getItemId() == android.R.id.home) {
-            finish(); // close this activity and return to preview activity (if there is any)
+            finish();
         }
 
         return super.onOptionsItemSelected(item);

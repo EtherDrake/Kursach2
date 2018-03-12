@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.Entry;
@@ -38,7 +39,9 @@ public class balance extends AppCompatActivity {
     User user;
     ImageButton calendar;
     Date today=new Date();
+    TextView date;
     int myYear, myMonth, myDay;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +57,7 @@ public class balance extends AppCompatActivity {
         spinner = findViewById(R.id.spinner4);
         spinner2=findViewById(R.id.spinner6);
         calendar=findViewById(R.id.imageButton3);
+        date=findViewById(R.id.textView38);
 
         String[] arraySpinner = new String[] {
                 "Витрати", "Доходи"
@@ -127,67 +131,79 @@ public class balance extends AppCompatActivity {
     public void setChart(boolean type, int period)
     {
         double[] sums;
-        if(type) sums=new double[user.categoriesIncome.size()];
-        else sums=new double[user.categoriesOutlay.size()];
-
+        if(type) sums=new double[user.data.categoriesIncome.size()];
+        else sums=new double[user.data.categoriesOutlay.size()];
         for (int i = 0; i < sums.length; i++) sums[i] = 0;
-        //Date today=new Date();
-
         switch (period) {
             case 0:
-                for (int j = 0; j < user.balanceActions.size(); j++) {
-                    balanceAction action=user.balanceActions.get(j);
+                for (int j = 0; j < user.data.balanceActions.size(); j++) {
+                    balanceAction action=user.data.balanceActions.get(j);
 
                     if (action.amount > 0 && action.date.getYear()==today.getYear() && action.date.getMonth()==today.getMonth() && action.date.getDate()==today.getDate() && type) {
-                        int index = user.categoriesIncome.indexOf(action.category);
+                        int index = user.data.categoriesIncome.indexOf(action.category);
                         sums[index] += Math.abs(action.amount);
                     } else if (action.amount < 0 && action.date.getYear()==today.getYear() && action.date.getMonth()==today.getMonth() && action.date.getDate()==today.getDate() && !type) {
-                        int index = user.categoriesOutlay.indexOf(action.category);
+                        int index = user.data.categoriesOutlay.indexOf(action.category);
                         sums[index] += Math.abs(action.amount);
                     }
                 }
                 break;
 
             case 1:
-                for (int j = 0; j < user.balanceActions.size(); j++) {
-                    balanceAction action=user.balanceActions.get(j);
+                for (int j = 0; j < user.data.balanceActions.size(); j++) {
+                    balanceAction action=user.data.balanceActions.get(j);
 
                     if (action.amount > 0 && action.date.getYear()==today.getYear() && action.date.getMonth()==today.getMonth() && type) {
-                        int index = user.categoriesIncome.indexOf(action.category);
+                        int index = user.data.categoriesIncome.indexOf(action.category);
                         sums[index] += Math.abs(action.amount);
                     } else if (action.amount < 0 && action.date.getYear()==today.getYear() && action.date.getMonth()==today.getMonth() && !type) {
-                        int index = user.categoriesOutlay.indexOf(action.category);
+                        int index = user.data.categoriesOutlay.indexOf(action.category);
                         sums[index] += Math.abs(action.amount);
                     }
                 }
                 break;
 
             case 2:
-                for (int j = 0; j < user.balanceActions.size(); j++) {
-                    balanceAction action = user.balanceActions.get(j);
+                for (int j = 0; j < user.data.balanceActions.size(); j++) {
+                    balanceAction action = user.data.balanceActions.get(j);
 
                     if (action.amount > 0 && action.date.getYear() == today.getYear() && type) {
-                        int index = user.categoriesIncome.indexOf(action.category);
+                        int index = user.data.categoriesIncome.indexOf(action.category);
                         sums[index] += Math.abs(action.amount);
                     } else if (action.amount < 0 && action.date.getYear() == today.getYear() && !type) {
-                        int index = user.categoriesOutlay.indexOf(action.category);
+                        int index = user.data.categoriesOutlay.indexOf(action.category);
                         sums[index] += Math.abs(action.amount);
                     }
                 }
                 break;
 
             case 3:
-                for (int j = 0; j < user.balanceActions.size(); j++) {
-                    if (user.balanceActions.get(j).amount > 0 && type) {
-                        int index = user.categoriesIncome.indexOf(user.balanceActions.get(j).category);
-                        sums[index] += Math.abs(user.balanceActions.get(j).amount);
-                    } else if (user.balanceActions.get(j).amount < 0 && !type) {
-                        int index = user.categoriesOutlay.indexOf(user.balanceActions.get(j).category);
-                        sums[index] += Math.abs(user.balanceActions.get(j).amount);
+                for (int j = 0; j < user.data.balanceActions.size(); j++) {
+                    if (user.data.balanceActions.get(j).amount > 0 && type) {
+                        int index = user.data.categoriesIncome.indexOf(user.data.balanceActions.get(j).category);
+                        sums[index] += Math.abs(user.data.balanceActions.get(j).amount);
+                    } else if (user.data.balanceActions.get(j).amount < 0 && !type) {
+                        int index = user.data.categoriesOutlay.indexOf(user.data.balanceActions.get(j).category);
+                        sums[index] += Math.abs(user.data.balanceActions.get(j).amount);
                     }
                 }
                 break;
         }
+
+        String line="";
+
+        if(type) line+="Доходи за ";
+        else line+="Витрати за ";
+
+        switch(period)
+        {
+            case 0: line+=Methods.formatDate(today); break;
+            case 1: line+=(today.getMonth()+1)+"/"+(today.getYear()+1900); break;
+            case 2: line+=(today.getYear()+1900); break;
+            default: line+="весь час";
+        }
+
+        date.setText(line);
 
         ArrayList<Entry> yvalues = new ArrayList<Entry>();
         ArrayList<String> xVals = new ArrayList<String>();
@@ -195,8 +211,8 @@ public class balance extends AppCompatActivity {
         {
             double value=sums[i];
             String label;
-            if(type) label=user.categoriesIncome.get(i);
-            else label=user.categoriesOutlay.get(i);
+            if(type) label=user.data.categoriesIncome.get(i);
+            else label=user.data.categoriesOutlay.get(i);
 
             if(value>0)
             {
@@ -211,7 +227,7 @@ public class balance extends AppCompatActivity {
         data.setValueFormatter(new PercentFormatter());
         data.setValueTextSize(16f);
         pieChart.setData(data);
-        pieChart.setDescription(Methods.formatDate(today));
+        pieChart.setDescription("");
         pieChart.getLegend().setEnabled(false);
     }
 
@@ -230,20 +246,15 @@ public class balance extends AppCompatActivity {
         {
             today=new Date(year-1900,monthOfYear,dayOfMonth);
             setChart(spinner.getSelectedItemPosition() == 1, spinner2.getSelectedItemPosition());
-            //outlayDate=new Date();
-            //dateOutput.setText(dayOfMonth+"/"+Integer.valueOf(monthOfYear+1)+"/"+year);
 
         }
     };
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // handle arrow click here
         if (item.getItemId() == android.R.id.home) {
-            finish(); // close this activity and return to preview activity (if there is any)
+            finish();
         }
-
         return super.onOptionsItemSelected(item);
     }
-
 }

@@ -53,8 +53,6 @@ public class AddIncome extends AppCompatActivity {
         
 
         index=getIntent().getIntExtra("Index",-1);
-
-        //CATEGORY=findViewById(R.id.editText7);
         spinnerCATEGORY=findViewById(R.id.spinner2);
         SUM=findViewById(R.id.editText8);
         INFO=findViewById(R.id.editText10);
@@ -65,19 +63,17 @@ public class AddIncome extends AppCompatActivity {
         user= Methods.load(this);
 
         if(index==-1)incomeDate=new Date();
-        else incomeDate=user.balanceActions.get(index).date;
-        //dateOutput.setText(incomeDate.getYear()+1900+"/"+incomeDate.getMonth()+1+"/"+incomeDate.getDate());
+        else incomeDate=user.data.balanceActions.get(index).date;
         dateOutput.setText(Methods.formatDate(incomeDate));
 
         if(index!=-1)
         {
-            //CATEGORY.setText(user.balanceActions.get(index).category);
-            SUM.setText(String.valueOf(user.balanceActions.get(index).amount));
-            INFO.setText(user.balanceActions.get(index).info);
+            SUM.setText(String.valueOf(user.data.balanceActions.get(index).amount));
+            INFO.setText(user.data.balanceActions.get(index).info);
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, user.categoriesIncome);
+                android.R.layout.simple_spinner_item, user.data.categoriesIncome);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCATEGORY.setAdapter(adapter);
@@ -90,8 +86,10 @@ public class AddIncome extends AppCompatActivity {
                         incomeDate, Double.parseDouble(SUM.getText().toString()),
                         INFO.getText().toString());
 
-                if(index==-1)user.balanceActions.add(income);
-                else user.balanceActions.set(index, income);
+                income.updatedAt=new Date();
+
+                if(index==-1)user.data.balanceActions.add(income);
+                else user.data.balanceActions.set(index, income);
 
                 Methods.save(user,AddIncome.this);
 
@@ -139,11 +137,9 @@ public class AddIncome extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // handle arrow click here
         if (item.getItemId() == android.R.id.home) {
-            finish(); // close this activity and return to preview activity (if there is any)
+            finish();
         }
-
         return super.onOptionsItemSelected(item);
     }
 }
