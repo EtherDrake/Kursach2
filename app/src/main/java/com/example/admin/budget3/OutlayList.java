@@ -30,6 +30,8 @@ import Classes.Product;
 import Classes.User;
 import Classes.balanceAction;
 
+import Utility.CategoryData;
+import Utility.categoryAdapter;
 import Utility.outlayAdapter;
 
 public class OutlayList extends AppCompatActivity {
@@ -75,15 +77,17 @@ public class OutlayList extends AppCompatActivity {
     public void refreshListView(int pType)
     {
             listView.setAdapter(null);
-            ArrayList<String> listToShow = new ArrayList<>();
+            ArrayList<CategoryData> listToShow = new ArrayList<>();
             ArrayList<balanceAction> listToShow2=new ArrayList<>();
             final ArrayList<Integer> indexes=new ArrayList<>();
             double[] sums;
             if(type==0)
             {
+                DecimalFormat df=new DecimalFormat("0.00");
                 sums=new double[user.data.categoriesOutlay.size()];
                 switch (pType) {
                     case 1: {
+
                         for (int i = 0; i < user.data.categoriesOutlay.size(); i++) sums[i] = 0;
 
                         for (int j = 0; j < user.data.balanceActions.size(); j++) {
@@ -96,7 +100,10 @@ public class OutlayList extends AppCompatActivity {
                     }
                 }
                 for (int i = 0; i < sums.length; i++)
-                    listToShow.add(user.data.categoriesOutlay.get(i) + ":" + sums[i] + "₴");
+                    listToShow.add(new CategoryData(user.data.categoriesOutlay.get(i), sums[i]));
+
+                //ArrayAdapter adapter = new ArrayAdapter(this, android.R., listToShow);
+                //listView.setAdapter(adapter);
 
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
@@ -108,12 +115,11 @@ public class OutlayList extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
-
-
             }
             else if(type==1)
             {
                 sums=new double[user.data.categoriesIncome.size()];
+                DecimalFormat df=new DecimalFormat("0.00");
                 switch (pType) {
                     case 1: {
                         for (int i = 0; i < user.data.categoriesIncome.size(); i++) sums[i] = 0;
@@ -131,7 +137,7 @@ public class OutlayList extends AppCompatActivity {
                     }
                 }
                 for (int i = 0; i < sums.length; i++)
-                    listToShow.add(user.data.categoriesIncome.get(i) + ":" + sums[i] + "₴");
+                    listToShow.add(new CategoryData(user.data.categoriesIncome.get(i), sums[i]));
 
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
@@ -154,7 +160,7 @@ public class OutlayList extends AppCompatActivity {
                 {
                     if (Objects.equals(user.data.balanceActions.get(i).category, category)) {
                         balanceAction action=user.data.balanceActions.get(i);
-                        listToShow.add(Methods.formatDate(action.date)+":"+user.data.balanceActions.get(i).info+"("+format.format(Math.abs(user.data.balanceActions.get(i).amount))+"₴)");
+                        //listToShow.add(Methods.formatDate(action.date)+":"+user.data.balanceActions.get(i).info+"("+format.format(Math.abs(user.data.balanceActions.get(i).amount))+"₴)");
                         listToShow2.add(user.data.balanceActions.get(i));
                         indexes.add(i);
                     }
@@ -226,7 +232,7 @@ public class OutlayList extends AppCompatActivity {
                 {
                     if (Objects.equals(user.data.balanceActions.get(i).category, category)) {
                         balanceAction action=user.data.balanceActions.get(i);
-                        listToShow.add(Methods.formatDate(action.date)+":"+user.data.balanceActions.get(i).info+"("+format.format(Math.abs(user.data.balanceActions.get(i).amount))+"₴)");
+                        //listToShow.add(Methods.formatDate(action.date)+":"+user.data.balanceActions.get(i).info+"("+format.format(Math.abs(user.data.balanceActions.get(i).amount))+"₴)");
                         listToShow2.add(user.data.balanceActions.get(i));
                         indexes.add(i);
                         Log.d("asd", String.valueOf(i));
@@ -292,7 +298,7 @@ public class OutlayList extends AppCompatActivity {
                     }
                 });
             }
-            ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listToShow);
+            categoryAdapter adapter = new categoryAdapter(this, listToShow);
             outlayAdapter adapter2=new outlayAdapter(this, listToShow2);
             if(type==0 || type==1) listView.setAdapter(adapter);
             else listView.setAdapter(adapter2);

@@ -32,6 +32,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.DecimalFormat;
 
 import Classes.Methods;
 import Classes.User;
@@ -123,18 +124,19 @@ public class MainDrawer extends AppCompatActivity
         user=Methods.load(MainDrawer.this);
         Log.d("MainDrawerID",user.ID);
 
+        DecimalFormat df=new DecimalFormat("0.00");
 
-        dailyIncome.setText(String.valueOf(user.getDailyIncome()));
-        monthlyIncome.setText(String.valueOf(user.getMonthlyIncome()));
-        yearlyIncome.setText(String.valueOf(user.getYearlyIncome()));
+        dailyIncome.setText(df.format(user.getDailyIncome()));
+        monthlyIncome.setText(df.format(user.getMonthlyIncome()));
+        yearlyIncome.setText(df.format(user.getYearlyIncome()));
 
-        dailyOutlay.setText(String.valueOf(user.getDailyOutlay()));
-        monthlyOutlay.setText(String.valueOf(user.getMonthlyOutlay()));
-        yearlyOutlay.setText(String.valueOf(user.getYearlyOutlay()));
+        dailyOutlay.setText(df.format(user.getDailyOutlay()));
+        monthlyOutlay.setText(df.format(user.getMonthlyOutlay()));
+        yearlyOutlay.setText(df.format(user.getYearlyOutlay()));
 
-        dailyBalance.setText(String.valueOf(user.getDailyBalance()));
-        monthlyBalance.setText(String.valueOf(user.getMonthlyBalance()));
-        yearlyBalance.setText(String.valueOf(user.getYearlyBalance()));
+        dailyBalance.setText(df.format(user.getDailyBalance()));
+        monthlyBalance.setText(df.format(user.getMonthlyBalance()));
+        yearlyBalance.setText(df.format(user.getYearlyBalance()));
 
         toShop.setText(String.valueOf(user.getPlannedShoppings()));
     }
