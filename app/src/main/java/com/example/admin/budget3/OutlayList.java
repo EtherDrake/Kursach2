@@ -52,26 +52,13 @@ public class OutlayList extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        user= Methods.load(this);
-        listView=findViewById(R.id.listView4);
-        list=user.data.balanceActions;
+        user = Methods.load(this);
+        listView = findViewById(R.id.listView4);
+        list = user.data.balanceActions;
 
-        type=getIntent().getIntExtra("type",0);
+        type = getIntent().getIntExtra("type", 0);
 
         refreshListView(1);
-    }
-
-    public void refreshListView()
-    {
-        listView.setAdapter(null);
-        ArrayList<String> listToShow=new ArrayList<>();
-        for(int i=0;i<list.size();i++)
-        {
-            listToShow.add(list.get(i).amount+"₴ ("+list.get(i).date+")");
-        }
-
-        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listToShow);
-        listView.setAdapter(adapter);
     }
 
     public void refreshListView(int pType)
@@ -83,7 +70,6 @@ public class OutlayList extends AppCompatActivity {
             double[] sums;
             if(type==0)
             {
-                DecimalFormat df=new DecimalFormat("0.00");
                 sums=new double[user.data.categoriesOutlay.size()];
                 switch (pType) {
                     case 1: {
@@ -93,6 +79,7 @@ public class OutlayList extends AppCompatActivity {
                         for (int j = 0; j < user.data.balanceActions.size(); j++) {
                             if (user.data.balanceActions.get(j).amount < 0) {
                                 int index = user.data.categoriesOutlay.indexOf(user.data.balanceActions.get(j).category);
+                                //if(index==-1) continue;
                                 sums[index] += Math.abs(user.data.balanceActions.get(j).amount);
                             }
                         }
@@ -115,11 +102,60 @@ public class OutlayList extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
+
+                listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                    @Override
+                    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                        LayoutInflater factory = LayoutInflater.from(OutlayList.this);
+
+                        final View textEntryView = factory.inflate(R.layout.change_category, null);
+
+                        final EditText nameInput = textEntryView.findViewById(R.id.editText16);
+
+                        nameInput.setText(user.data.categoriesOutlay.get(position));
+
+
+                        final AlertDialog.Builder alert = new AlertDialog.Builder(OutlayList.this);
+                        alert.setTitle(
+                                "Редагувати").setView(
+                                textEntryView).setPositiveButton("Зберегти",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        if(!Objects.equals(nameInput.getText().toString(), ""))
+                                        {
+                                            String name=nameInput.getText().toString();
+                                            String oldName=user.data.categoriesOutlay.get(position);
+                                            user.data.categoriesOutlay.set(position,name);
+                                            for(int i=0;i<user.data.balanceActions.size();i++)
+                                                if(Objects.equals(user.data.balanceActions.get(i).category, oldName))
+                                                {
+                                                    balanceAction toChange=user.data.balanceActions.get(i);
+                                                    toChange.category=name;
+                                                    user.data.balanceActions.set(i,toChange);
+                                                }
+                                            Methods.save(user, OutlayList.this);
+                                            refreshListView(1);
+                                        }
+                                    }
+                                }).setNegativeButton("Видалити",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+
+                                        for(int i = 0;i<user.data.balanceActions.size();i++)
+                                            if(Objects.equals(user.data.balanceActions.get(i).category, user.data.categoriesOutlay.get(position))) user.data.balanceActions.remove(i);
+                                        user.data.categoriesOutlay.remove(position);
+                                        Methods.save(user, OutlayList.this);
+                                        refreshListView(1);
+                                    }
+                                });
+                        alert.show();
+                        return true;
+                    }
+                });
             }
             else if(type==1)
             {
                 sums=new double[user.data.categoriesIncome.size()];
-                DecimalFormat df=new DecimalFormat("0.00");
                 switch (pType) {
                     case 1: {
                         for (int i = 0; i < user.data.categoriesIncome.size(); i++) sums[i] = 0;
@@ -150,12 +186,64 @@ public class OutlayList extends AppCompatActivity {
                     }
                 });
 
+                listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                    @Override
+                    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                        LayoutInflater factory = LayoutInflater.from(OutlayList.this);
+
+                        final View textEntryView = factory.inflate(R.layout.change_category, null);
+
+                        final EditText nameInput = textEntryView.findViewById(R.id.editText16);
+
+                        nameInput.setText(user.data.categoriesIncome.get(position));
+
+
+                        final AlertDialog.Builder alert = new AlertDialog.Builder(OutlayList.this);
+                        alert.setTitle(
+                                "Редагувати").setView(
+                                textEntryView).setPositiveButton("Зберегти",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        if(!Objects.equals(nameInput.getText().toString(), ""))
+                                        {
+                                            String name=nameInput.getText().toString();
+
+                                            String oldName=user.data.categoriesIncome.get(position);
+
+                                            for(int i=0;i<user.data.balanceActions.size();i++)
+                                                if(Objects.equals(user.data.balanceActions.get(i).category, oldName))
+                                                {
+                                                    balanceAction toChange=user.data.balanceActions.get(i);
+                                                    toChange.category=name;
+                                                    user.data.balanceActions.set(i,toChange);
+                                                }
+
+                                            user.data.categoriesIncome.set(position,name);
+                                            Methods.save(user, OutlayList.this);
+                                            refreshListView(1);
+                                        }
+                                    }
+                                }).setNegativeButton("Видалити",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+
+                                        for(int i = 0;i<user.data.balanceActions.size();i++)
+                                            if(Objects.equals(user.data.balanceActions.get(i).category, user.data.categoriesIncome.get(position))) user.data.balanceActions.remove(i);
+                                        user.data.categoriesIncome.remove(position);
+                                        Methods.save(user, OutlayList.this);
+                                        refreshListView(1);
+                                    }
+                                });
+                        alert.show();
+                        return true;
+                    }
+                });
+
             }
             else if(type==2)
             {
                 indexes.clear();
                 String category=getIntent().getStringExtra("cat");
-                NumberFormat format = new DecimalFormat("##.##");
                 for (int i = 0; i < user.data.balanceActions.size(); i++)
                 {
                     if (Objects.equals(user.data.balanceActions.get(i).category, category)) {
@@ -227,7 +315,6 @@ public class OutlayList extends AppCompatActivity {
             {
                 indexes.clear();
                 String category=getIntent().getStringExtra("cat");
-                NumberFormat format = new DecimalFormat("##.##");
                 for (int i = 0; i < user.data.balanceActions.size(); i++)
                 {
                     if (Objects.equals(user.data.balanceActions.get(i).category, category)) {
