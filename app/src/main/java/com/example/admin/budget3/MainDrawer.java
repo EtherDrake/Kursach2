@@ -43,9 +43,9 @@ import cz.msebera.android.httpclient.Header;
 public class MainDrawer extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    Button addIncome, addOutlay, openBalance, openShoppingLists/*, addCategoryIncome,addCategoryOutlay*/;
+    Button addIncome, addOutlay, openBalance, openShoppingLists;
     TextView dailyIncome, monthlyIncome, yearlyIncome, dailyOutlay, monthlyOutlay, yearlyOutlay,
-            dailyBalance, monthlyBalance, yearlyBalance, toShop;
+            dailyBalance, monthlyBalance, yearlyBalance, toShop, dailyIncomeLabel, dailyBalanceLabel;
     User user;
 
     @Override
@@ -71,6 +71,7 @@ public class MainDrawer extends AppCompatActivity
         openShoppingLists=findViewById(R.id.button8);
 
         dailyIncome=findViewById(R.id.textView7);
+        dailyIncomeLabel=findViewById(R.id.textView6);
         monthlyIncome=findViewById(R.id.textView5);
         yearlyIncome=findViewById(R.id.textView9);
 
@@ -79,8 +80,14 @@ public class MainDrawer extends AppCompatActivity
         yearlyOutlay=findViewById(R.id.textView16);
 
         dailyBalance=findViewById(R.id.textView26);
+        dailyBalanceLabel=findViewById(R.id.textView19);
         monthlyBalance=findViewById(R.id.textView25);
         yearlyBalance=findViewById(R.id.textView24);
+
+        dailyIncomeLabel.setVisibility(View.INVISIBLE);
+        dailyBalanceLabel.setVisibility(View.INVISIBLE);
+        dailyIncome.setVisibility(View.INVISIBLE);
+        dailyBalance.setVisibility(View.INVISIBLE);
 
         toShop=findViewById(R.id.textView28);
 

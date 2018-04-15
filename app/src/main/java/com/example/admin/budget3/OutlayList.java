@@ -46,11 +46,12 @@ public class OutlayList extends AppCompatActivity {
 
     int myYear, myMonth, myDay;
     Date actionDate, comparingDate;
-    int period, type;
+    int period, type, dialogType=0;
 
     Spinner spinner;
     Button calendar;
     ListView listView;
+    TextView sumOutlay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +67,9 @@ public class OutlayList extends AppCompatActivity {
         listView = findViewById(R.id.listView4);
         spinner = findViewById(R.id.spinner7);
         calendar = findViewById(R.id.button14);
+        sumOutlay=findViewById(R.id.textView43);
         list = user.data.balanceActions;
-
+        comparingDate=new Date();
         String[] arraySpinner = new String[] {
                 "День", "Місяць", "Рік", "Весь час"
         };
@@ -83,6 +85,35 @@ public class OutlayList extends AppCompatActivity {
         calendar.setVisibility(View.INVISIBLE);
 
         type = getIntent().getIntExtra("type", 0);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                calendar.setEnabled(i!=3);
+                if(i==3) calendar.setVisibility(View.INVISIBLE);
+                else calendar.setVisibility(View.VISIBLE);
+                refreshListView(1);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        calendar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Date date = new Date();
+                myYear = date.getYear()+1900;
+                myMonth = date.getMonth();
+                myDay = date.getDay();
+                Log.d("Date issue", String.valueOf(date.getYear()));
+                dialogType=1;
+                showDialog(1);
+
+            }
+        });
 
         refreshListView(1);
     }
@@ -111,8 +142,12 @@ public class OutlayList extends AppCompatActivity {
                         break;
                     }
                 }
-                for (int i = 0; i < sums.length; i++)
+                int sum=0;
+                for (int i = 0; i < sums.length; i++) {
                     listToShow.add(new CategoryData(user.data.categoriesOutlay.get(i), sums[i]));
+                    sum+=sums[i];
+                }
+                sumOutlay.setText(String.valueOf(sum)+"₴");
 
                 //ArrayAdapter adapter = new ArrayAdapter(this, android.R., listToShow);
                 //listView.setAdapter(adapter);
@@ -267,9 +302,11 @@ public class OutlayList extends AppCompatActivity {
             }
             else if(type==2 || type==3)
             {
+                int sum=0;
                 indexes.clear();
                 spinner.setVisibility(View.VISIBLE);
                 calendar.setVisibility(View.VISIBLE);
+                sumOutlay.setVisibility(View.VISIBLE);
 
                 String category=getIntent().getStringExtra("cat");
                 for (int i = 0; i < user.data.balanceActions.size(); i++)
@@ -281,11 +318,15 @@ public class OutlayList extends AppCompatActivity {
                                 || (spinner.getSelectedItemPosition()==3 )) {
                             balanceAction action = user.data.balanceActions.get(i);
                             //listToShow.add(Methods.formatDate(action.date)+":"+user.data.balanceActions.get(i).info+"("+format.format(Math.abs(user.data.balanceActions.get(i).amount))+"₴)");
+                            sum+=Math.abs(action.amount);
                             listToShow2.add(user.data.balanceActions.get(i));
                             indexes.add(i);
                         }
                     }
                 }
+
+                sumOutlay.setText(String.valueOf(sum)+"₴");
+
 
 
                 listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -395,7 +436,13 @@ public class OutlayList extends AppCompatActivity {
     {
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
         {
-            actionDate=new Date(year-1900,monthOfYear,dayOfMonth);
+            if(dialogType==1)
+            {
+                comparingDate=new Date(year-1900,monthOfYear,dayOfMonth);
+                dialogType=0;
+                refreshListView(1);
+            }
+            else actionDate=new Date(year-1900,monthOfYear,dayOfMonth);
         }
     };
 
