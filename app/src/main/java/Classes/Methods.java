@@ -299,20 +299,21 @@ public class Methods {
         {
             String category1=null, category2=null;
 
-            try{ category1=list1.get(i);}catch(Exception e){}
-            try{ category2=list2.get(i);}catch(Exception e){}
+            try{ category1=list1.get(i); if(fusion.contains(category1)) fusion.add(category1);}catch(Exception e){}
+            try{ category2=list2.get(i); if(!fusion.contains(category2)) fusion.add(category2);}catch(Exception e){}
 
-            if(category1==null) fusion.add(category2);
-            else if(category2==null) fusion.add(category1);
-            else
-            {
-                if(category1.equals(category2))fusion.add(category1);
+            //if(category1==null) fusion.add(category2);
+            //else if(category2==null) fusion.add(category1);
+            //else
+            //{
+                /*if(category1.equals(category2))fusion.add(category1);
                 else
                 {
                     fusion.add(category1);
                     fusion.add(category2);
-                }
-            }
+                }*/
+
+            //}
         }
         return fusion;
     }

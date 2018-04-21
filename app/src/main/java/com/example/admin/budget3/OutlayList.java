@@ -186,7 +186,7 @@ public class OutlayList extends AppCompatActivity {
 
                         final EditText nameInput = textEntryView.findViewById(R.id.editText16);
 
-                        nameInput.setText(user.data.categoriesOutlay.get(position));
+                        nameInput.setText(listToShow.get(position).categoryName);
 
 
                         final AlertDialog.Builder alert = new AlertDialog.Builder(OutlayList.this);
@@ -198,7 +198,7 @@ public class OutlayList extends AppCompatActivity {
                                         if(!Objects.equals(nameInput.getText().toString(), ""))
                                         {
                                             String name=nameInput.getText().toString();
-                                            String oldName=user.data.categoriesOutlay.get(position);
+                                            String oldName=listToShow.get(position).categoryName;
                                             user.data.categoriesOutlay.set(position,name);
                                             for(int i=0;i<user.data.balanceActions.size();i++)
                                                 if(Objects.equals(user.data.balanceActions.get(i).category, oldName))
@@ -214,10 +214,10 @@ public class OutlayList extends AppCompatActivity {
                                 }).setNegativeButton("Видалити",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int whichButton) {
-
                                         for(int i = 0;i<user.data.balanceActions.size();i++)
-                                            if(Objects.equals(user.data.balanceActions.get(i).category, user.data.categoriesOutlay.get(position))) user.data.balanceActions.remove(i);
-                                        user.data.categoriesOutlay.remove(position);
+                                            if(Objects.equals(user.data.balanceActions.get(i).category, listToShow.get(position).categoryName)) user.data.balanceActions.remove(i);
+                                        //int index=user.data.categoriesOutlay.indexOf(list.)
+                                        user.data.categoriesOutlay.remove(listToShow.get(position).categoryName);
                                         Methods.save(user, OutlayList.this);
                                         refreshListView(1);
                                     }
@@ -317,10 +317,10 @@ public class OutlayList extends AppCompatActivity {
                                 }).setNegativeButton("Видалити",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int whichButton) {
-
                                         for(int i = 0;i<user.data.balanceActions.size();i++)
-                                            if(Objects.equals(user.data.balanceActions.get(i).category, user.data.categoriesIncome.get(position))) user.data.balanceActions.remove(i);
-                                        user.data.categoriesIncome.remove(position);
+                                            if(Objects.equals(user.data.balanceActions.get(i).category, listToShow.get(position).categoryName)) user.data.balanceActions.remove(i);
+                                        //int index=user.data.categoriesOutlay.indexOf(list.)
+                                        user.data.categoriesIncome.remove(listToShow.get(position).categoryName);
                                         Methods.save(user, OutlayList.this);
                                         refreshListView(1);
                                     }
