@@ -26,6 +26,7 @@ import android.widget.TextView;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -36,6 +37,7 @@ import Classes.User;
 import Classes.balanceAction;
 
 import Utility.CategoryData;
+import Utility.actionComparator;
 import Utility.categoryAdapter;
 import Utility.outlayAdapter;
 
@@ -57,11 +59,12 @@ public class OutlayList extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_outlay_list);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
 
         user = Methods.load(this);
         listView = findViewById(R.id.listView4);
@@ -80,9 +83,6 @@ public class OutlayList extends AppCompatActivity {
 
         spinner.setAdapter(adapter);
         spinner.setSelection(3);
-
-        spinner.setVisibility(View.INVISIBLE);
-        calendar.setVisibility(View.INVISIBLE);
 
         type = getIntent().getIntExtra("type", 0);
 
@@ -115,18 +115,26 @@ public class OutlayList extends AppCompatActivity {
             }
         });
 
+        Date tmpDate=(Date)getIntent().getSerializableExtra("compDate");
+        if(tmpDate==null) tmpDate=new Date();
+        comparingDate=tmpDate;
+        int spinnerIndex=getIntent().getIntExtra("spinnerIndex",3);
+        spinner.setSelection(spinnerIndex);
         refreshListView(1);
+
     }
 
     public void refreshListView(int pType)
     {
             listView.setAdapter(null);
-            ArrayList<CategoryData> listToShow = new ArrayList<>();
+            final ArrayList<CategoryData> listToShow = new ArrayList<>();
             ArrayList<balanceAction> listToShow2=new ArrayList<>();
             final ArrayList<Integer> indexes=new ArrayList<>();
             double[] sums;
             if(type==0)
             {
+                spinner.setVisibility(View.VISIBLE);
+                calendar.setVisibility(View.VISIBLE);
                 sums=new double[user.data.categoriesOutlay.size()];
                 switch (pType) {
                     case 1: {
@@ -134,23 +142,27 @@ public class OutlayList extends AppCompatActivity {
 
                         for (int j = 0; j < user.data.balanceActions.size(); j++) {
                             if (user.data.balanceActions.get(j).amount < 0) {
-                                int index = user.data.categoriesOutlay.indexOf(user.data.balanceActions.get(j).category);
-                                //if(index==-1) continue;
-                                sums[index] += Math.abs(user.data.balanceActions.get(j).amount);
+                                if((spinner.getSelectedItemPosition()==0 && user.data.balanceActions.get(j).date.getDate()==comparingDate.getDate() && user.data.balanceActions.get(j).date.getMonth()==comparingDate.getMonth() && user.data.balanceActions.get(j).date.getYear()==comparingDate.getYear() )
+                                        || (spinner.getSelectedItemPosition()==1 && user.data.balanceActions.get(j).date.getMonth()==comparingDate.getMonth() && user.data.balanceActions.get(j).date.getYear()==comparingDate.getYear())
+                                        || (spinner.getSelectedItemPosition()==2  && user.data.balanceActions.get(j).date.getYear()==comparingDate.getYear())
+                                        || (spinner.getSelectedItemPosition()==3 )) {
+                                    int index = user.data.categoriesOutlay.indexOf(user.data.balanceActions.get(j).category);
+                                    sums[index] += Math.abs(user.data.balanceActions.get(j).amount);
+                                }
+
                             }
                         }
                         break;
                     }
                 }
-                int sum=0;
+                double sum=0;
+                DecimalFormat df=new DecimalFormat("0.00");
                 for (int i = 0; i < sums.length; i++) {
-                    listToShow.add(new CategoryData(user.data.categoriesOutlay.get(i), sums[i]));
+                    if(sums[i]>0)listToShow.add(new CategoryData(user.data.categoriesOutlay.get(i), sums[i]));
                     sum+=sums[i];
                 }
-                sumOutlay.setText(String.valueOf(sum)+"₴");
-
-                //ArrayAdapter adapter = new ArrayAdapter(this, android.R., listToShow);
-                //listView.setAdapter(adapter);
+                sumOutlay.setText(df.format(sum)+"₴");
+                Collections.sort(listToShow);
 
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
@@ -158,7 +170,9 @@ public class OutlayList extends AppCompatActivity {
                         // Get the selected item text from ListView
                         Intent intent = new Intent(OutlayList.this, OutlayList.class);
                         intent.putExtra("type", 2);
-                        intent.putExtra("cat", user.data.categoriesOutlay.get(position));
+                        intent.putExtra("cat", listToShow.get(position).categoryName);
+                        intent.putExtra("spinnerIndex", spinner.getSelectedItemPosition());
+                        intent.putExtra("compDate", comparingDate);
                         startActivity(intent);
                     }
                 });
@@ -215,6 +229,8 @@ public class OutlayList extends AppCompatActivity {
             }
             else if(type==1)
             {
+                spinner.setVisibility(View.VISIBLE);
+                calendar.setVisibility(View.VISIBLE);
                 sums=new double[user.data.categoriesIncome.size()];
                 switch (pType) {
                     case 1: {
@@ -222,8 +238,13 @@ public class OutlayList extends AppCompatActivity {
 
                         for (int j = 0; j < user.data.balanceActions.size(); j++) {
                             if (user.data.balanceActions.get(j).amount > 0) {
-                                int index = user.data.categoriesIncome.indexOf(user.data.balanceActions.get(j).category);
-                                sums[index] += Math.abs(user.data.balanceActions.get(j).amount);
+                                if((spinner.getSelectedItemPosition()==0 && user.data.balanceActions.get(j).date.getDate()==comparingDate.getDate() && user.data.balanceActions.get(j).date.getMonth()==comparingDate.getMonth() && user.data.balanceActions.get(j).date.getYear()==comparingDate.getYear() )
+                                        || (spinner.getSelectedItemPosition()==1 && user.data.balanceActions.get(j).date.getMonth()==comparingDate.getMonth() && user.data.balanceActions.get(j).date.getYear()==comparingDate.getYear())
+                                        || (spinner.getSelectedItemPosition()==2  && user.data.balanceActions.get(j).date.getYear()==comparingDate.getYear())
+                                        || (spinner.getSelectedItemPosition()==3 )) {
+                                    int index = user.data.categoriesIncome.indexOf(user.data.balanceActions.get(j).category);
+                                    sums[index] += Math.abs(user.data.balanceActions.get(j).amount);
+                                }
                             }
                         }
 
@@ -232,8 +253,16 @@ public class OutlayList extends AppCompatActivity {
                         break;
                     }
                 }
+
+                double sum=0;
+                DecimalFormat df=new DecimalFormat("0.00");
                 for (int i = 0; i < sums.length; i++)
-                    listToShow.add(new CategoryData(user.data.categoriesIncome.get(i), sums[i]));
+                {
+                    if(sums[i]>0)listToShow.add(new CategoryData(user.data.categoriesIncome.get(i), sums[i]));
+                    sum+=sums[i];
+                }
+                sumOutlay.setText(df.format(sum)+"₴");
+                Collections.sort(listToShow);
 
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
@@ -241,7 +270,9 @@ public class OutlayList extends AppCompatActivity {
                         // Get the selected item text from ListView
                         Intent intent = new Intent(OutlayList.this, OutlayList.class);
                         intent.putExtra("type", 3);
-                        intent.putExtra("cat", user.data.categoriesIncome.get(position));
+                        intent.putExtra("cat", listToShow.get(position).categoryName);
+                        intent.putExtra("spinnerIndex", spinner.getSelectedItemPosition());
+                        intent.putExtra("compDate", comparingDate);
                         startActivity(intent);
                     }
                 });
@@ -302,22 +333,21 @@ public class OutlayList extends AppCompatActivity {
             }
             else if(type==2 || type==3)
             {
-                int sum=0;
+                spinner.setVisibility(View.INVISIBLE);
+                calendar.setVisibility(View.INVISIBLE);
+                double sum=0;
                 indexes.clear();
-                spinner.setVisibility(View.VISIBLE);
-                calendar.setVisibility(View.VISIBLE);
                 sumOutlay.setVisibility(View.VISIBLE);
 
                 String category=getIntent().getStringExtra("cat");
                 for (int i = 0; i < user.data.balanceActions.size(); i++)
                 {
                     if (Objects.equals(user.data.balanceActions.get(i).category, category)) {
-                        if((spinner.getSelectedItemPosition()==0 && user.data.balanceActions.get(i).date.compareTo(comparingDate)==0)
+                        if((spinner.getSelectedItemPosition()==0 && user.data.balanceActions.get(i).date.getDate()==comparingDate.getDate() && user.data.balanceActions.get(i).date.getMonth()==comparingDate.getMonth() && user.data.balanceActions.get(i).date.getYear()==comparingDate.getYear() )
                                 || (spinner.getSelectedItemPosition()==1 && user.data.balanceActions.get(i).date.getMonth()==comparingDate.getMonth() && user.data.balanceActions.get(i).date.getYear()==comparingDate.getYear())
                                 || (spinner.getSelectedItemPosition()==2  && user.data.balanceActions.get(i).date.getYear()==comparingDate.getYear())
                                 || (spinner.getSelectedItemPosition()==3 )) {
                             balanceAction action = user.data.balanceActions.get(i);
-                            //listToShow.add(Methods.formatDate(action.date)+":"+user.data.balanceActions.get(i).info+"("+format.format(Math.abs(user.data.balanceActions.get(i).amount))+"₴)");
                             sum+=Math.abs(action.amount);
                             listToShow2.add(user.data.balanceActions.get(i));
                             indexes.add(i);
@@ -325,7 +355,9 @@ public class OutlayList extends AppCompatActivity {
                     }
                 }
 
-                sumOutlay.setText(String.valueOf(sum)+"₴");
+                DecimalFormat df=new DecimalFormat("0.00");
+                sumOutlay.setText(df.format(sum)+"₴");
+                Collections.sort(listToShow2, new actionComparator());
 
 
 
