@@ -27,16 +27,20 @@ import com.loopj.android.http.RequestParams;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Date;
 
 import Classes.Methods;
 import Classes.User;
 import Classes.UserData;
+import Classes.balanceAction;
 import cz.msebera.android.httpclient.Header;
 
 
@@ -225,7 +229,7 @@ public class MainDrawer extends AppCompatActivity
         else if (id == R.id.synchronise)
         {
             final User toSync= Methods.load(MainDrawer.this);
-            Log.d("user",toSync.ID);
+            //Log.d("user",toSync.ID);
 
             final AsyncHttpClient client = new AsyncHttpClient();
             String url="https://balance-rest.herokuapp.com/api/users/"+toSync.ID;
@@ -248,26 +252,65 @@ public class MainDrawer extends AppCompatActivity
 
 
 
-                        User fromBase =new User(id,Email,Password,data);
+                        User fromBase = new User(id,Email,Password,data);
                         User fusion=new User(toSync.ID,toSync.email,toSync.password);
 
-                        Log.d("fromBaseId",id);
-                        Log.d("fromBaseEmail",Email);
-                        Log.d("fromBasePassword",Password);
-                        Log.d("fromBaseRetrievedData",data.categoriesOutlay.get(0));
+                        //Log.d("fromBaseId",id);
+                        //Log.d("fromBaseEmail",Email);
+                        //Log.d("fromBasePassword",Password);
+                        //Log.d("fromBaseRetrievedData",data.categoriesOutlay.get(0));
 
                         fusion.ID=toSync.ID;
                         fusion.email=toSync.email;
                         fusion.password=toSync.password;
 
+                        File file = new File("User");
+                        Date lastModDate = new Date(file.lastModified());
                         fusion.data.balanceActions=Methods.fuseActions(toSync.data.balanceActions, fromBase.data.balanceActions);
                         fusion.data.shoppingLists=Methods.fuseLists(toSync.data.shoppingLists, fromBase.data.shoppingLists);
                         fusion.data.categoriesOutlay=Methods.fuseStringLists(toSync.data.categoriesOutlay, fromBase.data.categoriesOutlay);
                         fusion.data.categoriesIncome=Methods.fuseStringLists(toSync.data.categoriesIncome, fromBase.data.categoriesIncome);
 
+                        for(int i=0;i<fusion.data.balanceActions.size();i++)
+                        {
+                            if(fusion.data.balanceActions.get(i).amount<0 && !fusion.data.categoriesOutlay.contains(fusion.data.balanceActions.get(i).category)
+                                    || fusion.data.balanceActions.get(i).amount>0 && !fusion.data.categoriesIncome.contains(fusion.data.balanceActions.get(i).category))
+                                fusion.data.balanceActions.remove(i);
+                        }
+
+                        ArrayList<balanceAction> trashBin=Methods.loadTrashBin(MainDrawer.this);
+                        Log.d("trashBinSize:", String.valueOf(trashBin.size()));
+                        //fusion.data.balanceActions.removeAll(trashBin);
+                        for(int i=0;i<fusion.data.balanceActions.size();i++)
+                        {
+                            balanceAction action= fusion.data.balanceActions.get(i);
+
+                            for(int j=0;j<trashBin.size();j++)
+                            {
+
+                                balanceAction trash=trashBin.get(j);
+                                //int index=fusion.data.balanceActions.indexOf(trash);
+                                //Log.d("indexOfTrash", String.valueOf(index));
+                                //try{fusion.data.balanceActions.remove(index);} catch (Exception e){}
+                                //if(fusion.data.balanceActions.contains(trash))
+                                //{
+                                //    Log.d("isInFusion", "true");
+                                //    fusion.data.balanceActions.remove(trash);
+                                //}
+                                if(action.amount==trash.amount && action.updatedAt.equals(trash.updatedAt) && action.date.equals(trash.date) && action.category.equals(trash.category) && action.info.equals(trash.info))
+                                {
+                                    fusion.data.balanceActions.remove(i);
+                                    break;
+                                }
+                            }
+                        }
+
                         Methods.updateUser(fusion);
 
                         Methods.save(fusion,MainDrawer.this);
+
+                        trashBin.clear();
+                        Methods.saveTrashBin(trashBin,MainDrawer.this);
 
                         refreshMenu();
 

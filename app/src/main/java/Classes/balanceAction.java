@@ -28,7 +28,7 @@ public class balanceAction implements Serializable {
         if (o == this)return true;
         if (!(o instanceof balanceAction)) return false;
         balanceAction bal = (balanceAction) o;
-        return Objects.equals(this.category, bal.category) && this.date == bal.date && this.amount == bal.amount && Objects.equals(this.info, bal.info);
+        return Objects.equals(this.category, bal.category) && this.date.compareTo(bal.date) == 0 && this.amount == bal.amount && Objects.equals(this.info, bal.info) && this.updatedAt.compareTo(bal.updatedAt)==0;
     }
 
 }

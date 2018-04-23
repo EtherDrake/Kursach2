@@ -83,6 +83,38 @@ public class Methods {
         return user;
     }
 
+    public static void saveTrashBin(ArrayList<balanceAction> trashBin, Context ctx)
+    {
+        try {
+            FileOutputStream fos = ctx.openFileOutput("trash", Context.MODE_PRIVATE);
+            ObjectOutputStream os = new ObjectOutputStream(fos);
+            os.writeObject(trashBin);
+            os.close();
+            fos.close();
+            Log.d("MyLogs","File saved");
+        }catch (IOException e){Log.d("MyLogs","File not saved");}
+    }
+
+    public static ArrayList<balanceAction> loadTrashBin (Context ctx)
+    {
+
+        ArrayList<balanceAction> trashBin=new ArrayList<>();
+        try
+        {
+            FileInputStream fis = ctx.openFileInput("trash");
+            ObjectInputStream is = new ObjectInputStream(fis);
+            try
+            {
+                trashBin = (ArrayList<balanceAction>) is.readObject();
+            }catch (ClassNotFoundException e) { Log.d("MyLogs",
+                    "File not loaded ClassNotFound"); }
+            is.close();
+            fis.close();
+            Log.d("MyLogs","File loaded");
+        }catch (IOException e){Log.d("MyLogs","File not loaded IOE");}
+        return trashBin;
+    }
+
     public static String formatDate(Date date)
     {
         String value=date.getDate()+"/"+Integer.valueOf(date.getMonth()+1)+"/"+(date.getYear()+1900);
@@ -248,8 +280,8 @@ public class Methods {
             try{ action1=list1.get(i);}catch(Exception e){}
             try{ action2=list2.get(i);}catch(Exception e){}
 
-            if(action1==null) fusion.add(action2);
-            else if(action2==null) fusion.add(action1);
+            if(action1==null) {if(!fusion.contains(action2)) fusion.add(action2);}
+            else if(action2==null) {if(!fusion.contains(action2)) fusion.add(action1);}
             else
             {
                 if(action1.equals(action2))fusion.add(action1);
@@ -299,7 +331,7 @@ public class Methods {
         {
             String category1=null, category2=null;
 
-            try{ category1=list1.get(i); if(fusion.contains(category1)) fusion.add(category1);}catch(Exception e){}
+            try{ category1=list1.get(i); if(!fusion.contains(category1)) fusion.add(category1);}catch(Exception e){}
             try{ category2=list2.get(i); if(!fusion.contains(category2)) fusion.add(category2);}catch(Exception e){}
 
             //if(category1==null) fusion.add(category2);

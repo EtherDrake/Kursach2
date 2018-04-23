@@ -147,7 +147,7 @@ public class OutlayList extends AppCompatActivity {
                                         || (spinner.getSelectedItemPosition()==2  && user.data.balanceActions.get(j).date.getYear()==comparingDate.getYear())
                                         || (spinner.getSelectedItemPosition()==3 )) {
                                     int index = user.data.categoriesOutlay.indexOf(user.data.balanceActions.get(j).category);
-                                    sums[index] += Math.abs(user.data.balanceActions.get(j).amount);
+                                    if(index!=-1)sums[index] += Math.abs(user.data.balanceActions.get(j).amount);
                                 }
 
                             }
@@ -214,8 +214,15 @@ public class OutlayList extends AppCompatActivity {
                                 }).setNegativeButton("Видалити",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int whichButton) {
+                                        ArrayList<balanceAction> trashBin = new ArrayList<>();
+                                        trashBin=Methods.loadTrashBin(OutlayList.this);
                                         for(int i = 0;i<user.data.balanceActions.size();i++)
-                                            if(Objects.equals(user.data.balanceActions.get(i).category, listToShow.get(position).categoryName)) user.data.balanceActions.remove(i);
+                                            if(Objects.equals(user.data.balanceActions.get(i).category, listToShow.get(position).categoryName))
+                                            {
+                                                trashBin.add(user.data.balanceActions.get(i));
+                                                user.data.balanceActions.remove(i);
+                                            }
+                                        Methods.saveTrashBin(trashBin, OutlayList.this);
                                         //int index=user.data.categoriesOutlay.indexOf(list.)
                                         user.data.categoriesOutlay.remove(listToShow.get(position).categoryName);
                                         Methods.save(user, OutlayList.this);
@@ -317,9 +324,18 @@ public class OutlayList extends AppCompatActivity {
                                 }).setNegativeButton("Видалити",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int whichButton) {
+                                        ArrayList<balanceAction> trashBin=new ArrayList<>();
+                                        trashBin=Methods.loadTrashBin(OutlayList.this);
+                                        //trashBin.add(list.get(indexes.get(position)));
+
                                         for(int i = 0;i<user.data.balanceActions.size();i++)
-                                            if(Objects.equals(user.data.balanceActions.get(i).category, listToShow.get(position).categoryName)) user.data.balanceActions.remove(i);
+                                            if(Objects.equals(user.data.balanceActions.get(i).category, listToShow.get(position).categoryName))
+                                            {
+                                                trashBin.add(user.data.balanceActions.get(i));
+                                                user.data.balanceActions.remove(i);
+                                            }
                                         //int index=user.data.categoriesOutlay.indexOf(list.)
+                                        Methods.saveTrashBin(trashBin,OutlayList.this);
                                         user.data.categoriesIncome.remove(listToShow.get(position).categoryName);
                                         Methods.save(user, OutlayList.this);
                                         refreshListView(1);
@@ -438,6 +454,11 @@ public class OutlayList extends AppCompatActivity {
                                 }).setNegativeButton("Видалити",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int whichButton) {
+                                        ArrayList<balanceAction> trashBin=new ArrayList<>();
+                                        trashBin=Methods.loadTrashBin(OutlayList.this);
+                                        trashBin.add(list.get(indexes.get(position)));
+                                        Methods.saveTrashBin(trashBin,OutlayList.this);
+
                                         list.remove((int)indexes.get(position));
                                         Methods.save(user, OutlayList.this);
                                         refreshListView(1);
