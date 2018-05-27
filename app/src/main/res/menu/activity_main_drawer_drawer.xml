@@ -20,6 +20,36 @@
             android:id="@+id/shoppingLists"
             android:icon="@drawable/ic_shopping_list"
             android:title="Списки покупок" />
+
+        <item
+            android:id="@+id/box"
+            android:icon="@drawable/ic_box"
+            android:title="Чорна скринька" />
+
+        <item android:title="Групи">
+            <menu>
+                <item
+                    android:id="@+id/groups"
+                    android:icon="@drawable/ic_group"
+                    android:title="Групи" />
+
+                <item
+                    android:id="@+id/groupOutlays"
+                    android:icon="@drawable/ic_group_outlays"
+                    android:title="Витрати групи" />
+
+                <item
+                    android:id="@+id/inbox"
+                    android:icon="@drawable/ic_box"
+                    android:title="Отримані списки покупок" />
+
+                <item
+                    android:id="@+id/qr"
+                    android:icon="@drawable/ic_qr"
+                    android:title="QR-код" />
+
+            </menu>
+        </item>
     </group>
 
     <item android:title="Категорії">

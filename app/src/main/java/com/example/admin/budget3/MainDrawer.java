@@ -332,6 +332,31 @@ public class MainDrawer extends AppCompatActivity
             deleteFile("User");
             finish();
         }
+        else if (id == R.id.groups)
+        {
+            Intent intent = new Intent(MainDrawer.this, GroupActivity.class);
+            startActivity(intent);
+        }
+        else if (id == R.id.qr)
+        {
+            Intent intent = new Intent(MainDrawer.this, QRID.class);
+            startActivity(intent);
+        }
+        else if (id == R.id.groupOutlays)
+        {
+            Intent intent = new Intent(MainDrawer.this, GroupViewActivity.class);
+            startActivity(intent);
+        }
+        else if (id == R.id.box)
+        {
+            Intent intent = new Intent(MainDrawer.this, BlackBoxActivity.class);
+            startActivity(intent);
+        }
+        else if (id == R.id.inbox)
+        {
+            Intent intent = new Intent(MainDrawer.this, Inbox.class);
+            startActivity(intent);
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

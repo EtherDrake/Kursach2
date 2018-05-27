@@ -135,6 +135,27 @@ public class User implements Serializable {
         }
         return  outlay;
     }
+    public double getOverallOutlay()
+    {
+        double outlay=0;
+        for(int i=0;i<data.balanceActions.size();i++)
+        {
+            balanceAction action=data.balanceActions.get(i);
+            if(action.amount<0) outlay+=Math.abs(action.amount);
+        }
+        return  outlay;
+    }
+
+    public double getOutlayByCategory( String category)
+    {
+        double outlay=0;
+        for(int i=0;i<data.balanceActions.size();i++)
+        {
+            balanceAction action=data.balanceActions.get(i);
+            if(action.amount<0 && action.category.equals(category)) outlay+=Math.abs(action.amount);
+        }
+        return  outlay;
+    }
     //-------------</OUTLAY CALCULATION>-------------
 
     //-------------<INCOME CALCULATION>-------------

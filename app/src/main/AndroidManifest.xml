@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.admin.budget3">
+
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -17,6 +24,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -32,8 +40,10 @@
             android:name=".AddIncome"
             android:label="Додати дохід"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".MainMenuActivity"></activity>
-        <activity android:name=".AddOutlay" android:label="Додати витрату"/>
+        <activity android:name=".MainMenuActivity" />
+        <activity
+            android:name=".AddOutlay"
+            android:label="Додати витрату" />
         <activity
             android:name=".OutlayList"
             android:label="Список"
@@ -46,11 +56,49 @@
         <activity
             android:name=".MainDrawer"
             android:label="Головне меню"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".balance"
             android:label="Баланс"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".GroupActivity"
+            android:label="@string/title_activity_group"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".QRID"
+            android:label="@string/title_activity_qrid"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
+        <activity
+            android:name=".GroupViewActivity"
+            android:label="@string/title_activity_group_view"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".GroupOutlayCategory"
+            android:label="@string/title_activity_group_outlay_category"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".BlackBoxActivity"
+            android:label="@string/title_activity_black_box"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Inbox"
+            android:label="@string/title_activity_inbox"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ListReview"
+            android:label="@string/title_activity_list_review"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

@@ -38,6 +38,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -229,12 +230,80 @@ public class Methods {
     public static void updateUser(User user)
     {
         AsyncHttpClient client = new AsyncHttpClient();
-
         RequestParams params = userToParams(user);
-
         String url="https://balance-rest.herokuapp.com/api/users/"+user.ID;
-
         client.put(url, params,  new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onStart() {
+                // called before request is started
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                Log.d("connection","Success");
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                Log.d("connection","Fail");
+            }
+
+            @Override
+            public void onRetry(int retryNo) {
+                // called when request is retried
+            }
+        });
+    }
+
+    public static void updateShoppingList(ArrayList<ShoppingList> data, String id)
+    {
+        Log.d("sendShoppingLists", "Lists are going to be sent");
+        AsyncHttpClient client = new AsyncHttpClient();
+        String json = new Gson().toJson(data);
+        RequestParams params = new RequestParams();
+        params.put("data", json);
+
+        String url="https://balance-rest.herokuapp.com/api/inbox/"+id;
+        client.put(url, params,  new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onStart() {
+                // called before request is started
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                Log.d("connection","Success");
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                Log.d("connection","Fail");
+                Log.d("connection", e.getLocalizedMessage());
+            }
+
+            @Override
+            public void onRetry(int retryNo) {
+                // called when request is retried
+            }
+        });
+    }
+
+    public static void postShoppingList(ArrayList<ShoppingList> data, String id)
+    {
+        AsyncHttpClient client = new AsyncHttpClient();
+
+        RequestParams params = new RequestParams();
+
+        Gson gson = new Gson();
+        String json=gson.toJson(data);
+        params.put("id", id);
+        params.put("data", json);
+
+        String url="https://balance-rest.herokuapp.com/api/inbox";
+
+        client.post(url, params,  new AsyncHttpResponseHandler() {
 
             @Override
             public void onStart() {
@@ -350,5 +419,50 @@ public class Methods {
         return fusion;
     }
 
+    public static void postGroup(Group group)
+    {
+        AsyncHttpClient client = new AsyncHttpClient();
+
+        RequestParams params = new RequestParams();
+
+        Gson gson = new Gson();
+        String data=gson.toJson(group.members);
+        String id=group._id.toHexString();
+        params.put("id", id);
+        params.put("Data", data);
+
+        String url="https://balance-rest.herokuapp.com/api/groups/";
+
+        client.post(url, params,  new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onStart() {
+                // called before request is started
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                Log.d("connectionGroup","Success");
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                Log.d("connectionGroup","Fail");
+            }
+
+            @Override
+            public void onRetry(int retryNo) {
+                // called when request is retried
+            }
+        });
+    }
+
+    public static Object getKeyByIndex(LinkedHashMap map, int index){
+        return (map.keySet().toArray())[ index ];
+    }
+
+    public static Object getElementByIndex(LinkedHashMap map, int index){
+        return map.get( (map.keySet().toArray())[ index ] );
+    }
 
 }

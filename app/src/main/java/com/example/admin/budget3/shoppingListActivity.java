@@ -20,32 +20,48 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
+import org.bson.types.ObjectId;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Type;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
+import Classes.Group;
 import Classes.Methods;
 import Classes.Product;
 import Classes.ShoppingList;
 import Classes.User;
+import Classes.UserData;
 import Classes.balanceAction;
+import cz.msebera.android.httpclient.Header;
 
 public class shoppingListActivity extends AppCompatActivity {
 
     ShoppingList list;
     int index;
     User user;
+    Group group;
     ListView listView;
 
-    Button okButton, saveButton;
+    Button okButton, saveButton, shareButton;
     EditText textInput;
 
 
@@ -61,9 +77,12 @@ public class shoppingListActivity extends AppCompatActivity {
 
         okButton=findViewById(R.id.button3);
         saveButton=findViewById(R.id.button16);
+        shareButton=findViewById(R.id.button22);
         textInput=findViewById(R.id.editText6);
 
         user= Methods.load(this);
+        group=new Group(new ObjectId(user.ID));
+        group.load(this);
 
         index=getIntent().getIntExtra("index",-1);
         listView=findViewById(R.id.listView);
@@ -205,6 +224,77 @@ public class shoppingListActivity extends AppCompatActivity {
                         });
                 alert.show();
                 return true;
+            }
+        });
+
+        shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LayoutInflater factory = LayoutInflater.from(shoppingListActivity.this);
+
+                final View textEntryView = factory.inflate(R.layout.share_layout, null);
+
+                final Spinner spinner = textEntryView.findViewById(R.id.spinner8);
+
+                ArrayList<String> valuesList = new ArrayList<String>(group.members.values());
+                final ArrayList<ObjectId> keysList = new ArrayList<ObjectId>(group.members.keySet());
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(shoppingListActivity.this,
+                        android.R.layout.simple_spinner_item, valuesList);
+
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinner.setAdapter(adapter);
+                spinner.setSelection(0);
+
+
+                final AlertDialog.Builder alert = new AlertDialog.Builder(shoppingListActivity.this);
+                alert.setTitle(
+                        "Виберіть користувача:").setView(
+                        textEntryView).setPositiveButton("Поділитись",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                final ObjectId sendToId = keysList.get(spinner.getSelectedItemPosition());
+
+                                AsyncHttpClient client = new AsyncHttpClient();
+                                String url="https://balance-rest.herokuapp.com/api/inbox/"+sendToId.toHexString();
+
+                                client.get(url, new JsonHttpResponseHandler()
+                                {
+                                    @Override
+                                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                        Log.d("connection","JSON object");
+                                        try {
+                                            String JSONOfLists = response.getString("data");
+                                            Gson gson = new Gson();
+                                            Type listType = new TypeToken< ArrayList<ShoppingList> >(){}.getType();
+                                            ArrayList<ShoppingList> data = gson.fromJson(JSONOfLists, listType);
+                                            if(data==null) data = new ArrayList<>();
+                                            data.add(list);
+
+                                            Methods.updateShoppingList(data,sendToId.toHexString());
+
+                                        }catch (Exception ex){ex.printStackTrace();}
+
+                                    }
+
+                                    @Override
+                                    public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                                        Log.d("connection", "JSON Array");
+                                    }
+
+                                    @Override
+                                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                                        super.onFailure(statusCode, headers, responseString, throwable);
+                                        ArrayList<ShoppingList> data = new ArrayList<>();
+                                        data.add(list);
+                                        Methods.postShoppingList(data,sendToId.toHexString());
+                                        Log.d("fail","fail");
+                                    }
+
+                                });
+                            }
+                        });
+                alert.show();
             }
         });
     }

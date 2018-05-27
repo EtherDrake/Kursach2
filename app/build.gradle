@@ -35,5 +35,10 @@ dependencies {
     compile 'org.mongodb:mongo-java-driver:3.0.3'
     compile 'com.loopj.android:android-async-http:1.4.9'
     compile 'com.google.code.gson:gson:2.8.2'
+    compile 'com.google.android.gms:play-services-vision:15.0.1'
+    implementation 'com.journeyapps:zxing-android-embedded:2.3.0@aar'
+    implementation 'com.journeyapps:zxing-android-legacy:2.3.0@aar'
+    implementation 'com.journeyapps:zxing-android-integration:2.3.0@aar'
+    implementation 'com.google.zxing:core:3.2.0'
     implementation files('libs/mysql-connector-java-5.1.42-bin.jar')
 }

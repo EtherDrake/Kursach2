@@ -13,4 +13,11 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="title_activity_balance">balance</string>
+    <string name="title_activity_group">GroupActivity</string>
+    <string name="title_activity_qrid">QRID</string>
+    <string name="title_activity_group_view">GroupViewActivity</string>
+    <string name="title_activity_group_outlay_category">GroupOutlayCategory</string>
+    <string name="title_activity_black_box">BlackBoxActivity</string>
+    <string name="title_activity_inbox">Inbox</string>
+    <string name="title_activity_list_review">ListReview</string>
 </resources>
