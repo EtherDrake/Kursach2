@@ -168,7 +168,6 @@ public class User implements Serializable {
             balanceAction action=data.balanceActions.get(i);
             if(action.date.getYear()==today.getYear() && action.date.getMonth()==today.getMonth() && action.date.getDate()==today.getDate() && action.amount>0)
                 income += action.amount;
-                Log.d("incomeDateIssue", action.date.toString());
 
         }
         return  income;

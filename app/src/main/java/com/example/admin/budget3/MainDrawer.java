@@ -138,7 +138,6 @@ public class MainDrawer extends AppCompatActivity
 
         user=Methods.load(MainDrawer.this);
         group=new Group(new ObjectId(user.ID));
-        Log.d("MainDrawerID",user.ID);
 
         DecimalFormat df=new DecimalFormat("0.00");
 
@@ -244,7 +243,7 @@ public class MainDrawer extends AppCompatActivity
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     try {
-                        Log.d("connection",response.toString());
+                        Log.d("MainDrawerGet",response.toString());
 
                         String id=response.getString("_id");
                         String Email=response.getString("email");
@@ -279,7 +278,6 @@ public class MainDrawer extends AppCompatActivity
                         }
 
                         ArrayList<balanceAction> trashBin=Methods.loadTrashBin(MainDrawer.this);
-                        Log.d("trashBinSize:", String.valueOf(trashBin.size()));
                         for(int i=0;i<fusion.data.balanceActions.size();i++)
                         {
                             balanceAction action= fusion.data.balanceActions.get(i);

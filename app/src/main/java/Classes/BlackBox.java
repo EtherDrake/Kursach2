@@ -63,7 +63,7 @@ public class BlackBox implements Serializable {
             os.writeObject(this);
             os.close();
             fos.close();
-            Log.d("MyLogs","File saved");
-        }catch (IOException e){Log.d("MyLogs","File not saved");}
+            Log.d("BlackBox","File saved");
+        }catch (IOException e){Log.d("BlackBox","File not saved");}
     }
 }

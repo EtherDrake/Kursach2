@@ -55,7 +55,7 @@ public class Inbox extends AppCompatActivity {
         {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Log.d("connection","JSON object");
+                Log.d("InboxGet","JSON object");
                 try {
                     String JSONOfLists = response.getString("data");
                     Gson gson = new Gson();
@@ -91,12 +91,12 @@ public class Inbox extends AppCompatActivity {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                Log.d("connection", "JSON Array");
+                Log.d("InboxGet", "JSON Array");
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.d("connection", "Fail");
+                Log.d("InboxGet", "Fail");
             }
 
         });

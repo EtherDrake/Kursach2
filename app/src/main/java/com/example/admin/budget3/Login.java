@@ -82,13 +82,13 @@ public class Login extends AppCompatActivity {
                 {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        Log.d("connection","JSON array");
+                        Log.d("LoginGet","JSON array");
                     }
 
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                         try {
-                            Log.d("connection",response.toString());
+                            Log.d("LoginGet",response.toString());
                             JSONObject userJSON = (JSONObject) response.get(0);
 
                             String id=userJSON.getString("_id");
@@ -101,11 +101,6 @@ public class Login extends AppCompatActivity {
 
                             User retrievedUser =new User(id,email.getText().toString(),password.getText().toString(),data);
                             Methods.save(retrievedUser,Login.this);
-
-                            Log.d("id",retrievedUser.ID);
-                            Log.d("Email",retrievedUser.email);
-                            Log.d("Password",retrievedUser.password);
-                            Log.d("retrievedData",retrievedUser.data.categoriesOutlay.get(0));
 
                             group=new Group(new ObjectId(retrievedUser.ID));
                             group.save(Login.this);
@@ -125,7 +120,7 @@ public class Login extends AppCompatActivity {
                     @Override
                     public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                         //super.onFailure(statusCode, headers, throwable, errorResponse);
-                        Log.d("fail","fail");
+                        Log.d("LoginGet","fail");
                     }
 
                 });

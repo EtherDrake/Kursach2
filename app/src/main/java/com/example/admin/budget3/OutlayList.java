@@ -108,7 +108,6 @@ public class OutlayList extends AppCompatActivity {
                 myYear = date.getYear()+1900;
                 myMonth = date.getMonth();
                 myDay = date.getDay();
-                Log.d("Date issue", String.valueOf(date.getYear()));
                 dialogType=1;
                 showDialog(1);
 
@@ -329,7 +328,6 @@ public class OutlayList extends AppCompatActivity {
                                     public void onClick(DialogInterface dialog, int whichButton) {
                                         ArrayList<balanceAction> trashBin=new ArrayList<>();
                                         trashBin=Methods.loadTrashBin(OutlayList.this);
-                                        //trashBin.add(list.get(indexes.get(position)));
 
                                         for(int i = 0;i<user.data.balanceActions.size();i++)
                                             if(Objects.equals(user.data.balanceActions.get(i).category, listToShow.get(position).categoryName))
@@ -421,7 +419,6 @@ public class OutlayList extends AppCompatActivity {
                                 myYear = date.getYear()+1900;
                                 myMonth = date.getMonth();
                                 myDay = date.getDay();
-                                Log.d("Date issue", String.valueOf(date.getYear()));
                                 showDialog(1);
                                 dateOutput.setText(Methods.formatDate(actionDate));
                             }
@@ -448,10 +445,6 @@ public class OutlayList extends AppCompatActivity {
                                             if(type==2) toChange.category=user.data.categoriesOutlay.get(spinner.getSelectedItemPosition());
                                             else toChange.category=user.data.categoriesIncome.get(spinner.getSelectedItemPosition());
                                             toChange.date=actionDate;
-
-                                            Log.d("debugAmount", String.valueOf(toChange.amount));
-                                            Log.d("debugInfo", toChange.info);
-                                            Log.d("debug", String.valueOf(toChange.category));
 
                                             list.set(indexes.get(position),toChange);
                                             Methods.save(user, OutlayList.this);

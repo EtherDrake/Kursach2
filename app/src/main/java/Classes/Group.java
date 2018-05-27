@@ -71,12 +71,12 @@ public class Group implements Serializable {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-                Log.d("connection","Success");
+                Log.d("GroupConnectionPOST","Success");
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                Log.d("connection","Fail");
+                Log.d("GroupConnectionPOST","Fail");
             }
 
             @Override
@@ -109,12 +109,12 @@ public class Group implements Serializable {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-                Log.d("connectionGroup","Success");
+                Log.d("GroupConnectionPUT","Success");
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                Log.d("connectionGroup","Fail");
+                Log.d("GroupConnectionPUT","Fail");
             }
 
             @Override
@@ -135,9 +135,9 @@ public class Group implements Serializable {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 // If the response is JSONObject instead of expected JSONArray
-                Log.d("connection","JSON object");
+                Log.d("GroupConnectionGET","JSON object");
                 try {
-                    Log.d("connection",response.toString());
+                    Log.d("GroupConnectionGET",response.toString());
                     JSONObject userJSON = response;
 
                     String rawData= userJSON.getString("data");
@@ -155,8 +155,9 @@ public class Group implements Serializable {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                Log.d("GroupConnectionGET","JSON array");
                 try {
-                    Log.d("connection",response.toString());
+                    Log.d("GroupConnectionGET",response.toString());
                     JSONObject userJSON = (JSONObject) response.get(0);
 
                     String rawData= userJSON.getString("data");
@@ -176,27 +177,24 @@ public class Group implements Serializable {
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
                 //Group.this.createGroup();
-                Log.d("fail","fail");
+                Log.d("GroupConnectionGET","fail");
             }
         });
-
-        Log.d("test","test");
     }
 
     public void sync(final Context ctx)
     {
         AsyncHttpClient client = new AsyncHttpClient();
         String url="https://balance-rest.herokuapp.com/api/groups/"+this._id.toString();
-        //final User[] result = {new User()};
 
         client.get(url, new JsonHttpResponseHandler()
         {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 // If the response is JSONObject instead of expected JSONArray
-                Log.d("connection","JSON object");
+                Log.d("GroupConnectionGETsync","JSON object");
                 try {
-                    Log.d("connection",response.toString());
+                    Log.d("GroupConnectionGETsync",response.toString());
                     JSONObject userJSON = response;
 
                     String rawData= userJSON.getString("data");
@@ -227,7 +225,7 @@ public class Group implements Serializable {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 try {
-                    Log.d("connection",response.toString());
+                    Log.d("GroupConnectionGETsync",response.toString());
                     JSONObject userJSON = (JSONObject) response.get(0);
 
                     String rawData= userJSON.getString("data");
@@ -246,7 +244,7 @@ public class Group implements Serializable {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 //super.onFailure(statusCode, headers, throwable, errorResponse);
-                Log.d("fail","fail");
+                Log.d("GroupConnectionGETsync","fail");
             }
 
             @Override
@@ -266,8 +264,8 @@ public class Group implements Serializable {
             os.writeObject(this);
             os.close();
             fos.close();
-            Log.d("MyLogs","Group file saved");
-        }catch (IOException e){Log.d("MyLogs","File not saved");}
+            Log.d("GroupConnection","Group file saved");
+        }catch (IOException e){Log.d("GroupConnection","File not saved");}
     }
 
     public void load (Context ctx)
@@ -281,12 +279,12 @@ public class Group implements Serializable {
             try
             {
                 group = (Group) is.readObject();
-            }catch (ClassNotFoundException e) { Log.d("MyLogs",
+            }catch (ClassNotFoundException e) { Log.d("GroupConnection",
                     "File not loaded ClassNotFound"); }
             is.close();
             fis.close();
-            Log.d("MyLogs","File loaded");
-        }catch (IOException e){Log.d("MyLogs","File not loaded IOE");}
+            Log.d("GroupConnection","File loaded");
+        }catch (IOException e){Log.d("GroupConnection","File not loaded IOE");}
 
         if(group!=null)
         {

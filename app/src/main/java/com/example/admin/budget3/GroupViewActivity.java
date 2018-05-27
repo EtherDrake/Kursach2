@@ -64,7 +64,6 @@ public class GroupViewActivity extends AppCompatActivity {
 
         for (int i = 0; i < categories.size(); i++) {
             String category = categories.get(i);
-            Log.d("category debug", category + " - " + String.valueOf(i));
             double sum = 0;
             for (int j = 0; j < users.size(); j++)
                 sum += users.get(j).getOutlayByCategory(category);
@@ -87,14 +86,13 @@ public class GroupViewActivity extends AppCompatActivity {
         for (final Map.Entry<ObjectId, String> entry : group.members.entrySet()) {
                 AsyncHttpClient client = new AsyncHttpClient();
                 String url = "https://balance-rest.herokuapp.com/api/users/" + entry.getKey().toHexString();
-                Log.d("Connection", entry.getKey().toHexString());
 
                 client.get(url, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         // If the response is JSONObject instead of expected JSONArray
                         try {
-                            Log.d("connection", response.toString());
+                            Log.d("GroupViewGet", response.toString());
                             JSONObject userJSON = (JSONObject) response;
 
                             String id = userJSON.getString("_id");
@@ -104,11 +102,6 @@ public class GroupViewActivity extends AppCompatActivity {
                             String rawData = userJSON.getString("data");
                             Gson gson = new Gson();
                             UserData data = gson.fromJson(rawData, UserData.class);
-
-                            Log.d("id", id);
-                            Log.d("Email", Email);
-                            Log.d("Password", Password);
-                            Log.d("retrievedData", data.categoriesOutlay.get(0));
 
                             User retrievedUser = new User(id, Email, Password, data);
                             DecimalFormat format = new DecimalFormat("##.##");
@@ -124,7 +117,6 @@ public class GroupViewActivity extends AppCompatActivity {
 
                             for (int i = 0; i < categories.size(); i++) {
                                 String category = categories.get(i);
-                                Log.d("category debug", category + " - " + String.valueOf(i));
                                 double sum = 0;
                                 for (int j = 0; j < users.size(); j++)
                                     sum += users.get(j).getOutlayByCategory(category);
@@ -147,18 +139,18 @@ public class GroupViewActivity extends AppCompatActivity {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        Log.d("connection", "JSON object");
+                        Log.d("GroupViewGet", "JSON object");
                     }
 
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                        Log.d("connection Array", response.toString());
+                        Log.d("GroupViewGet", "JSON array");
                     }
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                         //super.onFailure(statusCode, headers, throwable, errorResponse);
-                        Log.d("connection fail", "fail");
+                        Log.d("GroupViewGet", "fail");
                     }
                 });
         }

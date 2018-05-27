@@ -86,7 +86,6 @@ public class shoppingListActivity extends AppCompatActivity {
 
         index=getIntent().getIntExtra("index",-1);
         listView=findViewById(R.id.listView);
-        Log.d("Index",String.valueOf(index));
 
         if(index==-1)
         {
@@ -262,7 +261,7 @@ public class shoppingListActivity extends AppCompatActivity {
                                 {
                                     @Override
                                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                                        Log.d("connection","JSON object");
+                                        Log.d("shoppingListGET","JSON object");
                                         try {
                                             String JSONOfLists = response.getString("data");
                                             Gson gson = new Gson();
@@ -279,7 +278,7 @@ public class shoppingListActivity extends AppCompatActivity {
 
                                     @Override
                                     public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                                        Log.d("connection", "JSON Array");
+                                        Log.d("shoppingListGET", "JSON Array");
                                     }
 
                                     @Override
@@ -288,7 +287,7 @@ public class shoppingListActivity extends AppCompatActivity {
                                         ArrayList<ShoppingList> data = new ArrayList<>();
                                         data.add(list);
                                         Methods.postShoppingList(data,sendToId.toHexString());
-                                        Log.d("fail","fail");
+                                        Log.d("shoppingListGET","fail");
                                     }
 
                                 });

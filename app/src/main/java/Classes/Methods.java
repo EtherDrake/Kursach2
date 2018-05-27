@@ -60,8 +60,8 @@ public class Methods {
             os.writeObject(user);
             os.close();
             fos.close();
-            Log.d("MyLogs","File saved");
-        }catch (IOException e){Log.d("MyLogs","File not saved");}
+            Log.d("MethodsUserSave","File saved");
+        }catch (IOException e){Log.d("UserSave","File not saved");}
     }
 
     public static User load (Context ctx)
@@ -75,12 +75,12 @@ public class Methods {
             try
             {
                 user = (User) is.readObject();
-            }catch (ClassNotFoundException e) { Log.d("MyLogs",
+            }catch (ClassNotFoundException e) { Log.d("MethodsUserLoad",
                     "File not loaded ClassNotFound"); }
             is.close();
             fis.close();
-            Log.d("MyLogs","File loaded");
-        }catch (IOException e){Log.d("MyLogs","File not loaded IOE");}
+            Log.d("MethodsUserLoad","File loaded");
+        }catch (IOException e){Log.d("MethodsUserLoad","File not loaded IOE");}
         return user;
     }
 
@@ -92,8 +92,8 @@ public class Methods {
             os.writeObject(trashBin);
             os.close();
             fos.close();
-            Log.d("MyLogs","File saved");
-        }catch (IOException e){Log.d("MyLogs","File not saved");}
+            Log.d("MethodsTrashSave","File saved");
+        }catch (IOException e){Log.d("MethodsTrashSave","File not saved");}
     }
 
     public static ArrayList<balanceAction> loadTrashBin (Context ctx)
@@ -107,12 +107,12 @@ public class Methods {
             try
             {
                 trashBin = (ArrayList<balanceAction>) is.readObject();
-            }catch (ClassNotFoundException e) { Log.d("MyLogs",
+            }catch (ClassNotFoundException e) { Log.d("MethodsTrashLoad",
                     "File not loaded ClassNotFound"); }
             is.close();
             fis.close();
-            Log.d("MyLogs","File loaded");
-        }catch (IOException e){Log.d("MyLogs","File not loaded IOE");}
+            Log.d("MethodsTrashLoad","File loaded");
+        }catch (IOException e){Log.d("MethodsTrashLoad","File not loaded IOE");}
         return trashBin;
     }
 
@@ -124,8 +124,8 @@ public class Methods {
             os.writeObject(trashBin);
             os.close();
             fos.close();
-            Log.d("MyLogs","File saved");
-        }catch (IOException e){Log.d("MyLogs","File not saved");}
+            Log.d("MethodsTrashCatSave","File saved");
+        }catch (IOException e){Log.d("MethodsTrashCatSave","File not saved");}
     }
 
     public static ArrayList<String> loadCategoryTrashBin (Context ctx)
@@ -139,12 +139,12 @@ public class Methods {
             try
             {
                 trashBin = (ArrayList<String>) is.readObject();
-            }catch (ClassNotFoundException e) { Log.d("MyLogs",
+            }catch (ClassNotFoundException e) { Log.d("MethodsTrashCatLoad",
                     "File not loaded ClassNotFound"); }
             is.close();
             fis.close();
-            Log.d("MyLogs","File loaded");
-        }catch (IOException e){Log.d("MyLogs","File not loaded IOE");}
+            Log.d("MethodsTrashCatLoad","File loaded");
+        }catch (IOException e){Log.d("MethodsTrashCatLoad","File not loaded IOE");}
         return trashBin;
     }
 
@@ -165,7 +165,6 @@ public class Methods {
         String data=gson.toJson(user.data);
         params.put("Data", data);
 
-        Log.d("DataSent",data.toString());
         return params;
     }
 
@@ -187,12 +186,12 @@ public class Methods {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-                Log.d("connection","Success");
+                Log.d("MethodsRegisterCon","Success");
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                Log.d("connection","Fail");
+                Log.d("MethodsRegisterCon","Fail");
             }
 
             @Override
@@ -206,7 +205,6 @@ public class Methods {
     {
         AsyncHttpClient client = new AsyncHttpClient();
         String url="https://balance-rest.herokuapp.com/api/users";
-        //final User[] result = {new User()};
 
         RequestParams params = new RequestParams();
         params.add("Email", email.trim());
@@ -217,33 +215,24 @@ public class Methods {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 // If the response is JSONObject instead of expected JSONArray
-                Log.d("connection","JSON array");
+                Log.d("MethodsLoginCon","JSON object");
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                Log.d("MethodsLoginCon","JSON array");
                 try {
-                    Log.d("connection",response.toString());
+                    Log.d("MethodsLoginCon",response.toString());
                     JSONObject userJSON = (JSONObject) response.get(0);
 
                     String id=userJSON.getString("_id");
-                    String Email=userJSON.getString("email");
-                    String Password=userJSON.getString("password");
 
                     String rawData= userJSON.getString("data");
                     Gson gson = new Gson();
                     UserData data = gson.fromJson(rawData, UserData.class);
 
-                    Log.d("id",id);
-                    Log.d("Email",Email);
-                    Log.d("Password",Password);
-                    Log.d("retrievedData",data.categoriesOutlay.get(0));
-
                     User retrievedUser =new User(id,email,password,data);
                     save(retrievedUser,ctx);
-
-                    //Intent intent = new Intent(ctx, MainDrawer.class);
-                    //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
                 } catch (Exception e) { e.printStackTrace(); }
             }
@@ -251,12 +240,10 @@ public class Methods {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 //super.onFailure(statusCode, headers, throwable, errorResponse);
-                Log.d("fail","fail");
+                Log.d("MethodsLoginCon","fail");
             }
-
         });
 
-        Log.d("test","test");
     }
 
     public static void updateUser(User user)
@@ -273,12 +260,12 @@ public class Methods {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-                Log.d("connection","Success");
+                Log.d("MethodsUpdateUser","Success");
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                Log.d("connection","Fail");
+                Log.d("MethodsUpdateUser","Fail");
             }
 
             @Override
@@ -290,7 +277,6 @@ public class Methods {
 
     public static void updateShoppingList(ArrayList<ShoppingList> data, String id)
     {
-        Log.d("sendShoppingLists", "Lists are going to be sent");
         AsyncHttpClient client = new AsyncHttpClient();
         String json = new Gson().toJson(data);
         RequestParams params = new RequestParams();
@@ -306,13 +292,12 @@ public class Methods {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-                Log.d("connection","Success");
+                Log.d("MethodsUpdateInbox","Success");
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                Log.d("connection","Fail");
-                Log.d("connection", e.getLocalizedMessage());
+                Log.d("MethodsUpdateInbox","Fail");
             }
 
             @Override
@@ -344,12 +329,12 @@ public class Methods {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-                Log.d("connection","Success");
+                Log.d("MethodsPostInbox","Success");
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                Log.d("connection","Fail");
+                Log.d("MethodsPostInbox","Fail");
             }
 
             @Override
@@ -358,17 +343,6 @@ public class Methods {
             }
         });
     }
-
-    /*public static <T> ArrayList<T> fuse(ArrayList<T> list1, ArrayList<T> list2)
-    {
-        ArrayList<T> result=list1;
-        result.removeAll(list2);
-        result.addAll(list2);
-        return result;
-        //Set<T> newSet = new HashSet<>(list1);
-        //newSet.addAll(list2);
-        //return new ArrayList<>(newSet);
-    }*/
 
     public static ArrayList<balanceAction> fuseActions (ArrayList<balanceAction> list1, ArrayList<balanceAction> list2)
     {
@@ -435,18 +409,6 @@ public class Methods {
             try{ category1=list1.get(i); if(!fusion.contains(category1)) fusion.add(category1);}catch(Exception e){}
             try{ category2=list2.get(i); if(!fusion.contains(category2)) fusion.add(category2);}catch(Exception e){}
 
-            //if(category1==null) fusion.add(category2);
-            //else if(category2==null) fusion.add(category1);
-            //else
-            //{
-                /*if(category1.equals(category2))fusion.add(category1);
-                else
-                {
-                    fusion.add(category1);
-                    fusion.add(category2);
-                }*/
-
-            //}
         }
         return fusion;
     }
@@ -474,12 +436,12 @@ public class Methods {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-                Log.d("connectionGroup","Success");
+                Log.d("MethodsPostGroup","Success");
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                Log.d("connectionGroup","Fail");
+                Log.d("MethodsPostGroup","Fail");
             }
 
             @Override

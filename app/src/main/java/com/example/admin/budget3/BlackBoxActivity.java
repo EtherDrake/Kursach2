@@ -60,21 +60,16 @@ public class BlackBoxActivity extends AppCompatActivity {
             try
             {
                 box = (BlackBox) is.readObject();
-            }catch (ClassNotFoundException e) { Log.d("MyLogs",
+            }catch (ClassNotFoundException e) { Log.d("BlackBoxSave",
                     "File not loaded ClassNotFound"); }
             is.close();
             fis.close();
-            Log.d("MyLogs","File loaded");
+            Log.d("BlackBoxSave","File loaded");
         }catch (IOException e){ box=new BlackBox(); box.save(BlackBoxActivity.this); }
 
         user=Methods.load(BlackBoxActivity.this);
 
-
         onAccount.setText(String.valueOf(box.getSum())+"₴ / "+String.valueOf(box.getGoal())+"₴");
-
-        //progress.getProgressDrawable().set(0);
-        //progress.setMax((int)(box.getGoal()));
-        //progress.setProgress((int)box.getSum());
 
         put.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -115,7 +115,6 @@ public class balance extends AppCompatActivity {
                 myYear = date.getYear()+1900;
                 myMonth = date.getMonth();
                 myDay = date.getDay();
-                Log.d("Date issue", String.valueOf(date.getYear()));
                 showDialog(1);
             }
         });

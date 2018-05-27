@@ -80,7 +80,6 @@ public class GroupActivity extends AppCompatActivity {
         add=findViewById(R.id.button17);
         groupView=findViewById(R.id.listView5);
 
-        Button scan=findViewById(R.id.button18);
 
         User user = Methods.load(this);
         yourId.setText("Ваш ID:"+user.ID);

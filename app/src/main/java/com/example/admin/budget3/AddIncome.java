@@ -107,7 +107,6 @@ public class AddIncome extends AppCompatActivity {
                 myYear = date.getYear()+1900;
                 myMonth = date.getMonth();
                 myDay = date.getDay();
-                Log.d("Date issue", String.valueOf(date.getYear()));
                 showDialog(1);
             }
         });
@@ -127,10 +126,6 @@ public class AddIncome extends AppCompatActivity {
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
         {
             incomeDate=new Date(year-1900,monthOfYear,dayOfMonth);
-
-            Log.d("Year",String.valueOf(incomeDate.getYear()));
-            Log.d("Month",String.valueOf(incomeDate.getMonth()));
-            Log.d("Day",String.valueOf(incomeDate.getDate()));
             dateOutput.setText(dayOfMonth+"/"+Integer.valueOf(monthOfYear+1)+"/"+year);
         }
     };

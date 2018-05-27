@@ -34,7 +34,6 @@ public class QRID extends AppCompatActivity {
         User user = Methods.load(this);
 
         try {
-            // generate a 150x150 QR code
             QRCodeWriter writer = new QRCodeWriter();
 
             BitMatrix bitMatrix = writer.encode(user.ID, BarcodeFormat.QR_CODE, 238, 238);
@@ -51,14 +50,6 @@ public class QRID extends AppCompatActivity {
             }
         } catch (WriterException e) { //eek }
 
-            /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                }
-            });*/
         }
 
     }

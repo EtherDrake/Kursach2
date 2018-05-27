@@ -80,7 +80,6 @@ public class AddOutlay extends AppCompatActivity {
                 myYear = date.getYear()+1900;
                 myMonth = date.getMonth();
                 myDay = date.getDay();
-                Log.d("Date issue", String.valueOf(date.getYear()));
                 showDialog(1);
             }
         });
@@ -119,9 +118,6 @@ public class AddOutlay extends AppCompatActivity {
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
         {
             outlayDate=new Date(year-1900,monthOfYear,dayOfMonth);
-            Log.d("Year",String.valueOf(outlayDate.getYear()));
-            Log.d("Month",String.valueOf(outlayDate.getMonth()));
-            Log.d("Day",String.valueOf(outlayDate.getDate()));
             dateOutput.setText(dayOfMonth+"/"+Integer.valueOf(monthOfYear+1)+"/"+year);
         }
     };
