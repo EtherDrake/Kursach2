@@ -30,6 +30,8 @@ import Classes.Group;
 import Classes.Methods;
 import Classes.User;
 import Classes.UserData;
+import Utility.CategoryData;
+import Utility.categoryAdapter;
 import cz.msebera.android.httpclient.Header;
 
 public class GroupViewActivity extends AppCompatActivity {
@@ -48,8 +50,39 @@ public class GroupViewActivity extends AppCompatActivity {
         final User user = Methods.load(this);
         final Group group = new Group(new ObjectId(user.ID));
         group.load(this);
-        final ArrayList<String> list = new ArrayList<>();
         final ArrayList<User> users = new ArrayList<>();
+        users.add(user);
+
+        HashSet<String> categoriesSet = new HashSet<>();
+        for (int i = 0; i < users.size(); i++) {
+            User current = users.get(i);
+            categoriesSet.addAll(current.data.categoriesOutlay);
+        }
+        final ArrayList<String> categories = new ArrayList<>();
+        categories.addAll(categoriesSet);
+        final ArrayList<CategoryData> listToShow= new ArrayList<>();
+
+        for (int i = 0; i < categories.size(); i++) {
+            String category = categories.get(i);
+            Log.d("category debug", category + " - " + String.valueOf(i));
+            double sum = 0;
+            for (int j = 0; j < users.size(); j++)
+                sum += users.get(j).getOutlayByCategory(category);
+            if (sum != 0) listToShow.add(new CategoryData(category, sum));//list.add(category + ":" + format.format(sum));
+        }
+
+        categoryAdapter adapter = new categoryAdapter(GroupViewActivity.this, listToShow);
+        overallOutlays.setAdapter(adapter);
+        overallOutlays.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Get the selected item text from ListView
+                Intent intent = new Intent(GroupViewActivity.this, GroupOutlayCategory.class);
+                //intent.putExtra("type", 2);
+                intent.putExtra("category", listToShow.get(position).categoryName);
+                startActivity(intent);
+            }
+        });
 
         for (final Map.Entry<ObjectId, String> entry : group.members.entrySet()) {
                 AsyncHttpClient client = new AsyncHttpClient();
@@ -87,7 +120,7 @@ public class GroupViewActivity extends AppCompatActivity {
                             }
                             final ArrayList<String> categories = new ArrayList<>();
                             categories.addAll(categoriesSet);
-                            list.clear();
+                            final ArrayList<CategoryData> listToShow= new ArrayList<>();
 
                             for (int i = 0; i < categories.size(); i++) {
                                 String category = categories.get(i);
@@ -95,10 +128,10 @@ public class GroupViewActivity extends AppCompatActivity {
                                 double sum = 0;
                                 for (int j = 0; j < users.size(); j++)
                                     sum += users.get(j).getOutlayByCategory(category);
-                                if (sum != 0) list.add(category + ":" + format.format(sum));
+                                if (sum != 0) listToShow.add(new CategoryData(category, sum));//list.add(category + ":" + format.format(sum));
                             }
 
-                            ArrayAdapter adapter = new ArrayAdapter(GroupViewActivity.this, android.R.layout.simple_list_item_1, list);
+                            categoryAdapter adapter = new categoryAdapter(GroupViewActivity.this, listToShow);
                             overallOutlays.setAdapter(adapter);
                             overallOutlays.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                 @Override
@@ -106,7 +139,7 @@ public class GroupViewActivity extends AppCompatActivity {
                                     // Get the selected item text from ListView
                                     Intent intent = new Intent(GroupViewActivity.this, GroupOutlayCategory.class);
                                     //intent.putExtra("type", 2);
-                                    intent.putExtra("category", list.get(position).split(":")[0]);
+                                    intent.putExtra("category", listToShow.get(position).categoryName);
                                     startActivity(intent);
                                 }
                             });

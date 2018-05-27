@@ -223,6 +223,9 @@ public class OutlayList extends AppCompatActivity {
                                                 user.data.balanceActions.remove(i);
                                             }
                                         Methods.saveTrashBin(trashBin, OutlayList.this);
+                                        ArrayList<String> categoriesTrashBin=Methods.loadCategoryTrashBin(OutlayList.this);
+                                        categoriesTrashBin.add(listToShow.get(position).categoryName);
+                                        Methods.saveCategoryTrashBin(categoriesTrashBin, OutlayList.this);
                                         //int index=user.data.categoriesOutlay.indexOf(list.)
                                         user.data.categoriesOutlay.remove(listToShow.get(position).categoryName);
                                         Methods.save(user, OutlayList.this);
@@ -334,8 +337,12 @@ public class OutlayList extends AppCompatActivity {
                                                 trashBin.add(user.data.balanceActions.get(i));
                                                 user.data.balanceActions.remove(i);
                                             }
-                                        //int index=user.data.categoriesOutlay.indexOf(list.)
                                         Methods.saveTrashBin(trashBin,OutlayList.this);
+
+                                        ArrayList<String> categoriesTrashBin=Methods.loadCategoryTrashBin(OutlayList.this);
+                                        categoriesTrashBin.add(listToShow.get(position).categoryName);
+                                        Methods.saveCategoryTrashBin(categoriesTrashBin, OutlayList.this);
+
                                         user.data.categoriesIncome.remove(listToShow.get(position).categoryName);
                                         Methods.save(user, OutlayList.this);
                                         refreshListView(1);

@@ -32,6 +32,8 @@ import Classes.Group;
 import Classes.Methods;
 import Classes.User;
 import Classes.UserData;
+import Utility.CategoryData;
+import Utility.categoryAdapter;
 import cz.msebera.android.httpclient.Header;
 
 public class GroupOutlayCategory extends AppCompatActivity {
@@ -48,14 +50,44 @@ public class GroupOutlayCategory extends AppCompatActivity {
 
         overallOutlays = findViewById(R.id.listView7);
         pieChart = findViewById(R.id.piechart2);
+        final String category = getIntent().getStringExtra("category");
 
         final User user = Methods.load(this);
         final Group group = new Group(new ObjectId(user.ID));
         group.load(this);
-        final ArrayList<String> list = new ArrayList<>();
         final ArrayList<User> users = new ArrayList<>();
+        users.add(user);
 
-        final String category = getIntent().getStringExtra("category");
+        ArrayList<CategoryData> listToShow=new ArrayList<>();
+
+        listToShow.add(new CategoryData("Я", user.getOutlayByCategory(category)));
+
+        categoryAdapter adapter = new categoryAdapter(GroupOutlayCategory.this, listToShow);
+        overallOutlays.setAdapter(adapter);
+
+        ArrayList<Entry> yvalues = new ArrayList<Entry>();
+        ArrayList<String> xVals = new ArrayList<String>();
+        for(int i=0;i<listToShow.size(); i++)
+        {
+            double value=listToShow.get(i).categoryAmount;
+            String label = listToShow.get(i).categoryName;
+            if(value>0)
+            {
+                yvalues.add(new Entry((float) value, i));
+                xVals.add(label);
+            }
+        }
+
+        PieDataSet dataSet = new PieDataSet(yvalues, "");
+        dataSet.setColors(ColorTemplate.VORDIPLOM_COLORS);
+        PieData piedata = new PieData(xVals, dataSet);
+        piedata.setValueTextSize(16f);
+        pieChart.setData(piedata);
+        pieChart.setDescription("");
+        pieChart.getLegend().setEnabled(false);
+        pieChart.invalidate();
+
+
 
         for (final Map.Entry<ObjectId, String> entry : group.members.entrySet()) {
             AsyncHttpClient client = new AsyncHttpClient();
@@ -84,30 +116,26 @@ public class GroupOutlayCategory extends AppCompatActivity {
                         Log.d("retrievedData", data.categoriesOutlay.get(0));
 
                         User retrievedUser = new User(id, Email, Password, data);
-                        DecimalFormat format = new DecimalFormat("##.##");
                         users.add(retrievedUser);
 
-                        list.clear();
+                        ArrayList<CategoryData> listToShow=new ArrayList<>();
+                        listToShow.add(new CategoryData("Я", user.getOutlayByCategory(category)));
 
-                        ArrayList<Double> sums=new ArrayList<>();
-                        ArrayList<String> userlist=new ArrayList<>();
-
-                        for (int i = 0; i < users.size(); i++) {
+                        for (int i = 1; i < users.size(); i++) {
                             double sum=users.get(i).getOutlayByCategory(category);
-                            sums.add(sum);
-                            userlist.add(group.members.get(new ObjectId(users.get(i).ID)));
-                            list.add(group.members.get(new ObjectId(users.get(i).ID)) + ":" + format.format(sum));
+                            String nickname;
+                            listToShow.add(new CategoryData(group.members.get(new ObjectId(users.get(i).ID)), sum));
                         }
 
-                        ArrayAdapter adapter = new ArrayAdapter(GroupOutlayCategory.this, android.R.layout.simple_list_item_1, list);
+                        categoryAdapter adapter = new categoryAdapter(GroupOutlayCategory.this, listToShow);
                         overallOutlays.setAdapter(adapter);
 
                         ArrayList<Entry> yvalues = new ArrayList<Entry>();
                         ArrayList<String> xVals = new ArrayList<String>();
-                        for(int i=0;i<sums.size(); i++)
+                        for(int i=0;i<listToShow.size(); i++)
                         {
-                            double value=sums.get(i);
-                            String label = userlist.get(i);
+                            double value=listToShow.get(i).categoryAmount;
+                            String label = listToShow.get(i).categoryName;
                             if(value>0)
                             {
                                 yvalues.add(new Entry((float) value, i));
@@ -118,7 +146,6 @@ public class GroupOutlayCategory extends AppCompatActivity {
                         PieDataSet dataSet = new PieDataSet(yvalues, "");
                         dataSet.setColors(ColorTemplate.VORDIPLOM_COLORS);
                         PieData piedata = new PieData(xVals, dataSet);
-                        //piedata.setValueFormatter(new PercentFormatter());
                         piedata.setValueTextSize(16f);
                         pieChart.setData(piedata);
                         pieChart.setDescription("");

@@ -62,7 +62,6 @@ public class categoriesList extends AppCompatActivity {
 
                 nameInput.setText(list.get(position));
 
-
                 final AlertDialog.Builder alert = new AlertDialog.Builder(categoriesList.this);
                 alert.setTitle(
                         "Редагувати").setView(
@@ -73,7 +72,10 @@ public class categoriesList extends AppCompatActivity {
                                 {
                                     String name=nameInput.getText().toString();
                                     String oldName=list.get(position);
-                                    user.data.categoriesOutlay.set(position,name);
+
+                                    if(type==0)user.data.categoriesIncome.set(position,name);
+                                    else user.data.categoriesOutlay.set(position,name);
+
                                     for(int i=0;i<user.data.balanceActions.size();i++)
                                         if(Objects.equals(user.data.balanceActions.get(i).category, oldName))
                                         {
@@ -88,7 +90,12 @@ public class categoriesList extends AppCompatActivity {
                         }).setNegativeButton("Видалити",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                user.data.categoriesOutlay.remove(position);
+                                ArrayList<String> categoryTrashBin=Methods.loadCategoryTrashBin(categoriesList.this);
+                                if(type==0) categoryTrashBin.add(user.data.categoriesIncome.get(position));
+                                else categoryTrashBin.add(user.data.categoriesOutlay.get(position));
+                                Methods.saveCategoryTrashBin(categoryTrashBin,categoriesList.this);
+                                if(type==0) user.data.categoriesIncome.remove(position);
+                                else user.data.categoriesOutlay.remove(position);
                                 Methods.save(user, categoriesList.this);
                                 refreshList();
                             }

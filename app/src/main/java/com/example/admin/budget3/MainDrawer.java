@@ -24,6 +24,7 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import org.bson.types.ObjectId;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -37,6 +38,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import Classes.Group;
 import Classes.Methods;
 import Classes.User;
 import Classes.UserData;
@@ -51,6 +53,7 @@ public class MainDrawer extends AppCompatActivity
     TextView dailyIncome, monthlyIncome, yearlyIncome, dailyOutlay, monthlyOutlay, yearlyOutlay,
             dailyBalance, monthlyBalance, yearlyBalance, toShop, dailyIncomeLabel, dailyBalanceLabel;
     User user;
+    Group group;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +61,7 @@ public class MainDrawer extends AppCompatActivity
         setContentView(R.layout.activity_main_drawer);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -133,6 +137,7 @@ public class MainDrawer extends AppCompatActivity
     {
 
         user=Methods.load(MainDrawer.this);
+        group=new Group(new ObjectId(user.ID));
         Log.d("MainDrawerID",user.ID);
 
         DecimalFormat df=new DecimalFormat("0.00");
@@ -229,7 +234,6 @@ public class MainDrawer extends AppCompatActivity
         else if (id == R.id.synchronise)
         {
             final User toSync= Methods.load(MainDrawer.this);
-            //Log.d("user",toSync.ID);
 
             final AsyncHttpClient client = new AsyncHttpClient();
             String url="https://balance-rest.herokuapp.com/api/users/"+toSync.ID;
@@ -255,10 +259,6 @@ public class MainDrawer extends AppCompatActivity
                         User fromBase = new User(id,Email,Password,data);
                         User fusion=new User(toSync.ID,toSync.email,toSync.password);
 
-                        //Log.d("fromBaseId",id);
-                        //Log.d("fromBaseEmail",Email);
-                        //Log.d("fromBasePassword",Password);
-                        //Log.d("fromBaseRetrievedData",data.categoriesOutlay.get(0));
 
                         fusion.ID=toSync.ID;
                         fusion.email=toSync.email;
@@ -280,7 +280,6 @@ public class MainDrawer extends AppCompatActivity
 
                         ArrayList<balanceAction> trashBin=Methods.loadTrashBin(MainDrawer.this);
                         Log.d("trashBinSize:", String.valueOf(trashBin.size()));
-                        //fusion.data.balanceActions.removeAll(trashBin);
                         for(int i=0;i<fusion.data.balanceActions.size();i++)
                         {
                             balanceAction action= fusion.data.balanceActions.get(i);
@@ -289,14 +288,6 @@ public class MainDrawer extends AppCompatActivity
                             {
 
                                 balanceAction trash=trashBin.get(j);
-                                //int index=fusion.data.balanceActions.indexOf(trash);
-                                //Log.d("indexOfTrash", String.valueOf(index));
-                                //try{fusion.data.balanceActions.remove(index);} catch (Exception e){}
-                                //if(fusion.data.balanceActions.contains(trash))
-                                //{
-                                //    Log.d("isInFusion", "true");
-                                //    fusion.data.balanceActions.remove(trash);
-                                //}
                                 if(action.amount==trash.amount && action.updatedAt.equals(trash.updatedAt) && action.date.equals(trash.date) && action.category.equals(trash.category) && action.info.equals(trash.info))
                                 {
                                     fusion.data.balanceActions.remove(i);
@@ -305,12 +296,19 @@ public class MainDrawer extends AppCompatActivity
                             }
                         }
 
+                        ArrayList<String> categoryTrashBin=Methods.loadCategoryTrashBin(MainDrawer.this);
+                        for(int i=0;i<categoryTrashBin.size();i++)
+                        {
+                            if(fusion.data.categoriesIncome.contains(categoryTrashBin.get(i)))fusion.data.categoriesIncome.remove(categoryTrashBin.get(i));
+                            if(fusion.data.categoriesOutlay.contains(categoryTrashBin.get(i)))fusion.data.categoriesOutlay.remove(categoryTrashBin.get(i));
+                        }
+                        deleteFile("catrash");
+
                         Methods.updateUser(fusion);
 
                         Methods.save(fusion,MainDrawer.this);
 
-                        trashBin.clear();
-                        Methods.saveTrashBin(trashBin,MainDrawer.this);
+                        deleteFile("trash");
 
                         refreshMenu();
 
@@ -330,6 +328,9 @@ public class MainDrawer extends AppCompatActivity
         else if (id == R.id.logOut)
         {
             deleteFile("User");
+            deleteFile("Group");
+            deleteFile("trash");
+            deleteFile("catrash");
             finish();
         }
         else if (id == R.id.groups)

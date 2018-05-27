@@ -22,6 +22,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,11 +37,13 @@ import cz.msebera.android.httpclient.Header;
 public class Group implements Serializable {
     public ObjectId _id;
     public LinkedHashMap<ObjectId, String> members;
+    public Date updatedAt;
 
     public Group (ObjectId ID)
     {
         this._id=ID;
         members=new LinkedHashMap<>();
+        updatedAt=new Date();
     }
 
     public void createGroup()
@@ -51,8 +54,11 @@ public class Group implements Serializable {
 
         Gson gson = new Gson();
         String data=gson.toJson(this.members);
+        String updatedJson=gson.toJson(this.updatedAt);
         params.put("id", this._id);
         params.put("Data", data);
+        params.put("updatedAt", updatedJson);
+
 
         String url="https://balance-rest.herokuapp.com/api/groups";
 
@@ -88,7 +94,9 @@ public class Group implements Serializable {
 
         Gson gson = new Gson();
         String data=gson.toJson(this.members);
+        String updatedJson=gson.toJson(this.updatedAt);
         params.put("Data", data);
+        params.put("updatedAt", updatedJson);
 
         String url="https://balance-rest.herokuapp.com/api/groups/"+this._id.toString();
 
@@ -122,14 +130,27 @@ public class Group implements Serializable {
         String url="https://balance-rest.herokuapp.com/api/groups/"+this._id.toString();
         //final User[] result = {new User()};
 
-
-
         client.get(url, new JsonHttpResponseHandler()
         {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 // If the response is JSONObject instead of expected JSONArray
-                Log.d("connection","JSON array");
+                Log.d("connection","JSON object");
+                try {
+                    Log.d("connection",response.toString());
+                    JSONObject userJSON = response;
+
+                    String rawData= userJSON.getString("data");
+                    String rawUpdated=userJSON.getString("updatedAt");
+                    Gson gson = new Gson();
+                    Type typeOfMap = new TypeToken<LinkedHashMap<String, ObjectId>>() { }.getType();
+                    LinkedHashMap<ObjectId, String> data = gson.fromJson(rawData, typeOfMap);
+                    Date baseUpdated = gson.fromJson(rawUpdated,Date.class);
+
+                    Group.this.members=data;
+                    Group.this.updatedAt=baseUpdated;
+
+                } catch (Exception e) { e.printStackTrace(); }
             }
 
             @Override
@@ -139,11 +160,85 @@ public class Group implements Serializable {
                     JSONObject userJSON = (JSONObject) response.get(0);
 
                     String rawData= userJSON.getString("data");
+                    String rawUpdated=userJSON.getString("updatedAt");
                     Gson gson = new Gson();
                     Type typeOfMap = new TypeToken<Map<String, ObjectId>>() { }.getType();
                     LinkedHashMap<ObjectId, String> data = gson.fromJson(rawData, typeOfMap);
+                    Date baseUpdated = gson.fromJson(rawUpdated,Date.class);
 
                     Group.this.members=data;
+                    Group.this.updatedAt=baseUpdated;
+
+                } catch (Exception e) { e.printStackTrace(); }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                //Group.this.createGroup();
+                Log.d("fail","fail");
+            }
+        });
+
+        Log.d("test","test");
+    }
+
+    public void sync(final Context ctx)
+    {
+        AsyncHttpClient client = new AsyncHttpClient();
+        String url="https://balance-rest.herokuapp.com/api/groups/"+this._id.toString();
+        //final User[] result = {new User()};
+
+        client.get(url, new JsonHttpResponseHandler()
+        {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                // If the response is JSONObject instead of expected JSONArray
+                Log.d("connection","JSON object");
+                try {
+                    Log.d("connection",response.toString());
+                    JSONObject userJSON = response;
+
+                    String rawData= userJSON.getString("data");
+                    String rawUpdated=userJSON.getString("updatedAt");
+                    Gson gson = new Gson();
+                    Type typeOfMap = new TypeToken<LinkedHashMap<String, ObjectId>>() { }.getType();
+                    LinkedHashMap<ObjectId, String> data = gson.fromJson(rawData, typeOfMap);
+                    Date baseUpdated = gson.fromJson(rawUpdated,Date.class);
+
+                    Group group = new Group(Group.this._id);
+                    group.members=data;
+                    group.updatedAt=baseUpdated;
+
+                    if(Group.this.updatedAt.before(group.updatedAt))
+                    {
+                        Group.this.members=group.members;
+                        Group.this.updatedAt=group.updatedAt;
+                        Group.this.save(ctx);
+                    }
+                    else
+                    {
+                        Group.this.updateGroup();
+                    }
+
+                } catch (Exception e) { e.printStackTrace(); }
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                try {
+                    Log.d("connection",response.toString());
+                    JSONObject userJSON = (JSONObject) response.get(0);
+
+                    String rawData= userJSON.getString("data");
+                    String rawUpdated=userJSON.getString("updatedAt");
+                    Gson gson = new Gson();
+                    Type typeOfMap = new TypeToken<Map<String, ObjectId>>() { }.getType();
+                    LinkedHashMap<ObjectId, String> data = gson.fromJson(rawData, typeOfMap);
+                    Date baseUpdated = gson.fromJson(rawUpdated,Date.class);
+
+                    Group.this.members=data;
+                    Group.this.updatedAt=baseUpdated;
 
                 } catch (Exception e) { e.printStackTrace(); }
             }
@@ -153,9 +248,13 @@ public class Group implements Serializable {
                 //super.onFailure(statusCode, headers, throwable, errorResponse);
                 Log.d("fail","fail");
             }
-        });
 
-        Log.d("test","test");
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String errorResponse, Throwable throwable)
+            {
+                super.onFailure(statusCode, headers, errorResponse, throwable);
+            }
+        });
     }
 
     public void save(Context ctx)

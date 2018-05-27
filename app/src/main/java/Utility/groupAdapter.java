@@ -14,6 +14,7 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 import java.util.Map;
 
+import Classes.Group;
 import Classes.Methods;
 import Classes.balanceAction;
 
@@ -23,10 +24,11 @@ import Classes.balanceAction;
 
 public class groupAdapter extends BaseAdapter {
     Context context;
-    Map<ObjectId, String> data;
+    //Map<ObjectId, String> data;
+    Group data;
     private static LayoutInflater inflater = null;
 
-    public groupAdapter(Context context, Map<ObjectId, String> data) {
+    public groupAdapter(Context context, Group data) {
         // TODO Auto-generated constructor stub
         this.context = context;
         this.data = data;
@@ -37,13 +39,13 @@ public class groupAdapter extends BaseAdapter {
     @Override
     public int getCount() {
         // TODO Auto-generated method stub
-        return data.size();
+        return data.members.size();
     }
 
     @Override
     public Object getItem(int position) {
         // TODO Auto-generated method stub
-        return data.get(position);
+        return data.getByIndex(position);
     }
 
     @Override
@@ -57,12 +59,13 @@ public class groupAdapter extends BaseAdapter {
         // TODO Auto-generated method stub
         View vi = convertView;
         if (vi == null)
-            vi = inflater.inflate(R.layout.groupitemlayout, null);
+            vi = inflater.inflate(R.layout.group_member_layout, null);
 
-        TextView id = (TextView) vi.findViewById(R.id.textView48);
-        TextView nickname = (TextView) vi.findViewById(R.id.textView47);
+        TextView id = (TextView) vi.findViewById(R.id.textView54);
+        TextView nickname = (TextView) vi.findViewById(R.id.textView53);
 
-        //id.setText(data.get(data.keySet()).date);
+        id.setText("ID:"+data.members.keySet().toArray()[position]);
+        nickname.setText(data.getByIndex(position));
 
         return vi;
     }

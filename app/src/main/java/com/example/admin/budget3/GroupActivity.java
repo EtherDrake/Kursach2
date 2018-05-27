@@ -51,6 +51,8 @@ import Classes.Methods;
 import Classes.Product;
 import Classes.User;
 import Classes.balanceAction;
+import Utility.CategoryData;
+import Utility.groupAdapter;
 
 public class GroupActivity extends AppCompatActivity {
 
@@ -59,15 +61,7 @@ public class GroupActivity extends AppCompatActivity {
     Button add;
     ListView groupView;
 
-    BarcodeDetector detector;
-
     Group group;
-
-    private static final int REQUEST_WRITE_PERMISSION = 20;
-    private static final int PHOTO_REQUEST = 10;
-    private static final String SAVED_INSTANCE_URI = "uri";
-    private static final String SAVED_INSTANCE_RESULT = "result";
-    private Uri imageUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +90,6 @@ public class GroupActivity extends AppCompatActivity {
         group.load(this);
         if(fromBase.members.size()>group.members.size()) group=fromBase;
         else if(fromBase.members.size()==0)group.createGroup(); else group.updateGroup();
-        //if(group.members.size()>0) Log.d("d",">0");
 
         add.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,153 +104,14 @@ public class GroupActivity extends AppCompatActivity {
             }
         });
 
-        scan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ActivityCompat.requestPermissions(GroupActivity.this, new
-                        String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_PERMISSION);
-            }
-        });
-
-        detector = new BarcodeDetector.Builder(getApplicationContext())
-                .setBarcodeFormats(Barcode.DATA_MATRIX | Barcode.QR_CODE)
-                .build();
-        if (!detector.isOperational()) {
-            Toast toast = Toast.makeText(getApplicationContext(),
-                    "Could not set up the detector!", Toast.LENGTH_SHORT);
-            toast.show();
-            return;
-        }
 
         refreshGroupView();
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case REQUEST_WRITE_PERMISSION:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    takePicture();
-                } else {
-                    Toast.makeText(GroupActivity.this, "Permission Denied!", Toast.LENGTH_SHORT).show();
-                }
-        }
-    }
-
-    private void takePicture() {
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File photo = new File(Environment.getExternalStorageDirectory(), "picture.jpg");
-        imageUri = FileProvider.getUriForFile(GroupActivity.this,
-                BuildConfig.APPLICATION_ID + ".provider", photo);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-        startActivityForResult(intent, PHOTO_REQUEST);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PHOTO_REQUEST && resultCode == RESULT_OK) {
-            launchMediaScanIntent();
-            try {
-                Bitmap bitmap = decodeBitmapUri(this, imageUri);
-                if (detector.isOperational() && bitmap != null) {
-                    Frame frame = new Frame.Builder().setBitmap(bitmap).build();
-                    SparseArray<Barcode> barcodes = detector.detect(frame);
-                    for (int index = 0; index < barcodes.size(); index++) {
-                        Barcode code = barcodes.valueAt(index);
-                        //scanResults.setText(scanResults.getText() + code.displayValue + "\n");
-
-                        //Required only if you need to extract the type of barcode
-                        int type = barcodes.valueAt(index).valueFormat;
-                        switch (type) {
-                            case Barcode.CONTACT_INFO:
-                                //Log.i(LOG_TAG, code.contactInfo.title);
-                                break;
-                            case Barcode.EMAIL:
-                                //Log.i(LOG_TAG, code.email.address);
-                                break;
-                            case Barcode.ISBN:
-                                //Log.i(LOG_TAG, code.rawValue);
-                                break;
-                            case Barcode.PHONE:
-                                //Log.i(LOG_TAG, code.phone.number);
-                                break;
-                            case Barcode.PRODUCT:
-                                //Log.i(LOG_TAG, code.rawValue);
-                                break;
-                            case Barcode.SMS:
-                                //Log.i(LOG_TAG, code.sms.message);
-                                break;
-                            case Barcode.TEXT:
-                                //Log.i(LOG_TAG, code.rawValue);
-                                memberId.setText(code.rawValue);
-                                break;
-                            case Barcode.URL:
-                                //Log.i(LOG_TAG, "url: " + code.url.url);
-                                break;
-                            case Barcode.WIFI:
-                                //Log.i(LOG_TAG, code.wifi.ssid);
-                                break;
-                            case Barcode.GEO:
-                                //Log.i(LOG_TAG, code.geoPoint.lat + ":" + code.geoPoint.lng);
-                                break;
-                            case Barcode.CALENDAR_EVENT:
-                                //Log.i(LOG_TAG, code.calendarEvent.description);
-                                break;
-                            case Barcode.DRIVER_LICENSE:
-                                //Log.i(LOG_TAG, code.driverLicense.licenseNumber);
-                                break;
-                            default:
-                                //Log.i(LOG_TAG, code.rawValue);
-                                break;
-                        }
-                    }
-                    if (barcodes.size() == 0) {
-                        //scanResults.setText("Scan Failed: Found nothing to scan");
-                    }
-                } else {
-                    //scanResults.setText("Could not set up the detector!");
-                }
-            } catch (Exception e) {
-                Toast.makeText(this, "Failed to load Image", Toast.LENGTH_SHORT)
-                        .show();
-                //Log.e(LOG_TAG, e.toString());
-            }
-        }
-    }
-
-    private void launchMediaScanIntent() {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        mediaScanIntent.setData(imageUri);
-        this.sendBroadcast(mediaScanIntent);
-    }
-
-    private Bitmap decodeBitmapUri(Context ctx, Uri uri) throws FileNotFoundException {
-        int targetW = 600;
-        int targetH = 600;
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(ctx.getContentResolver().openInputStream(uri), null, bmOptions);
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
-
-        int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-
-        return BitmapFactory.decodeStream(ctx.getContentResolver()
-                .openInputStream(uri), null, bmOptions);
-    }
-
     public void refreshGroupView()
     {
-        ArrayList<String> list=new ArrayList<>();
-        for (Map.Entry<ObjectId, String> entry : group.members.entrySet())
-        {
-            list.add(entry.getValue()+":"+entry.getKey());
-        }
-        
-        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, list);
+
+        groupAdapter adapter = new groupAdapter(this, group);
         groupView.setAdapter(adapter);
 
         groupView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -297,15 +151,6 @@ public class GroupActivity extends AppCompatActivity {
                 return true;
             }
         });
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        if (imageUri != null) {
-            outState.putString(SAVED_INSTANCE_URI, imageUri.toString());
-            outState.putString(SAVED_INSTANCE_RESULT, memberId.getText().toString());
-        }
-        super.onSaveInstanceState(outState);
     }
 
     @Override

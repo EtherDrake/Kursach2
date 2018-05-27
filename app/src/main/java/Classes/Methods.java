@@ -116,6 +116,38 @@ public class Methods {
         return trashBin;
     }
 
+    public static void saveCategoryTrashBin(ArrayList<String> trashBin, Context ctx)
+    {
+        try {
+            FileOutputStream fos = ctx.openFileOutput("catrash", Context.MODE_PRIVATE);
+            ObjectOutputStream os = new ObjectOutputStream(fos);
+            os.writeObject(trashBin);
+            os.close();
+            fos.close();
+            Log.d("MyLogs","File saved");
+        }catch (IOException e){Log.d("MyLogs","File not saved");}
+    }
+
+    public static ArrayList<String> loadCategoryTrashBin (Context ctx)
+    {
+
+        ArrayList<String> trashBin=new ArrayList<>();
+        try
+        {
+            FileInputStream fis = ctx.openFileInput("catrash");
+            ObjectInputStream is = new ObjectInputStream(fis);
+            try
+            {
+                trashBin = (ArrayList<String>) is.readObject();
+            }catch (ClassNotFoundException e) { Log.d("MyLogs",
+                    "File not loaded ClassNotFound"); }
+            is.close();
+            fis.close();
+            Log.d("MyLogs","File loaded");
+        }catch (IOException e){Log.d("MyLogs","File not loaded IOE");}
+        return trashBin;
+    }
+
     public static String formatDate(Date date)
     {
         String value=date.getDate()+"/"+Integer.valueOf(date.getMonth()+1)+"/"+(date.getYear()+1900);

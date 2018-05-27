@@ -20,9 +20,11 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import org.bson.types.ObjectId;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import Classes.Group;
 import Classes.Methods;
 import Classes.User;
 import Classes.UserData;
@@ -34,6 +36,7 @@ public class Login extends AppCompatActivity {
     EditText email, password;
     Button login;
     User user=null;
+    Group group;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +53,6 @@ public class Login extends AppCompatActivity {
             startActivity(intent);
             finish();
         }
-
-
 
         changeWindow=findViewById(R.id.textView);
         email=findViewById(R.id.editText);
@@ -105,6 +106,9 @@ public class Login extends AppCompatActivity {
                             Log.d("Email",retrievedUser.email);
                             Log.d("Password",retrievedUser.password);
                             Log.d("retrievedData",retrievedUser.data.categoriesOutlay.get(0));
+
+                            group=new Group(new ObjectId(retrievedUser.ID));
+                            group.save(Login.this);
 
                             Intent intent = new Intent(Login.this, MainDrawer.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
