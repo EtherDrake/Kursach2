@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -30,6 +31,7 @@ public class QRID extends AppCompatActivity {
         setContentView(R.layout.activity_qrid);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         image_view = findViewById(R.id.imageView2);
         User user = Methods.load(this);
 
@@ -51,6 +53,13 @@ public class QRID extends AppCompatActivity {
         } catch (WriterException e) { //eek }
 
         }
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

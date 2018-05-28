@@ -4,11 +4,6 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="true" />
-
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
@@ -63,7 +58,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".GroupActivity"
-            android:label="@string/title_activity_group"
+            android:label="Група"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".QRID"
@@ -82,23 +77,23 @@
 
         <activity
             android:name=".GroupViewActivity"
-            android:label="@string/title_activity_group_view"
+            android:label="Витрати групи"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".GroupOutlayCategory"
-            android:label="@string/title_activity_group_outlay_category"
+            android:label="Витрати групи"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".BlackBoxActivity"
-            android:label="@string/title_activity_black_box"
+            android:label="Чорна скринька"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Inbox"
-            android:label="@string/title_activity_inbox"
+            android:label="Отримані списки покупок"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ListReview"
-            android:label="@string/title_activity_list_review"
+            android:label="Список покупок"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
