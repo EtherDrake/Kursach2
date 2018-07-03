@@ -306,5 +306,4 @@ public class Group implements Serializable {
         List<String> l = new ArrayList<String>(members.values());
         return l.get(i);
     }
-
 }

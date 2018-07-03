@@ -71,7 +71,7 @@ public class BlackBoxActivity extends AppCompatActivity {
 
         user=Methods.load(BlackBoxActivity.this);
 
-        onAccount.setText(String.valueOf(box.getSum())+"₴ / "+String.valueOf(box.getGoal())+"₴");
+        onAccount.setText(String.valueOf(box.getSum())+"₴ ");
 
         put.setOnClickListener(new View.OnClickListener() {
             @Override
