@@ -175,7 +175,7 @@ public class Methods {
         User user=new User(email, password);
         RequestParams params = userToParams(user);
 
-        String url="https://balance-rest.herokuapp.com/api/users";
+        String url="https://kursatch-api.herokuapp.com/api/users";
 
         client.post(url, params,  new AsyncHttpResponseHandler() {
 
@@ -204,7 +204,7 @@ public class Methods {
     public static void login(final String email, final String password, final Context ctx)
     {
         AsyncHttpClient client = new AsyncHttpClient();
-        String url="https://balance-rest.herokuapp.com/api/users";
+        String url="https://kursatch-api.herokuapp.com/api/users";
 
         RequestParams params = new RequestParams();
         params.add("Email", email.trim());
@@ -250,7 +250,7 @@ public class Methods {
     {
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams params = userToParams(user);
-        String url="https://balance-rest.herokuapp.com/api/users/"+user.ID;
+        String url="https://kursatch-api.herokuapp.com/api/users/"+user.ID;
         client.put(url, params,  new AsyncHttpResponseHandler() {
 
             @Override

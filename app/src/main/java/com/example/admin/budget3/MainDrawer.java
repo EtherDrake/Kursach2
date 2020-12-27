@@ -51,7 +51,7 @@ public class MainDrawer extends AppCompatActivity
 
     Button addIncome, addOutlay, openBalance, openShoppingLists;
     TextView dailyIncome, monthlyIncome, yearlyIncome, dailyOutlay, monthlyOutlay, yearlyOutlay,
-            dailyBalance, monthlyBalance, yearlyBalance, toShop, dailyIncomeLabel, dailyBalanceLabel;
+            dailyBalance, monthlyBalance, yearlyBalance, toShop;
     User user;
     Group group;
 
@@ -78,8 +78,6 @@ public class MainDrawer extends AppCompatActivity
         openBalance=findViewById(R.id.button7);
         openShoppingLists=findViewById(R.id.button8);
 
-        dailyIncome=findViewById(R.id.textView7);
-        dailyIncomeLabel=findViewById(R.id.textView6);
         monthlyIncome=findViewById(R.id.textView5);
         yearlyIncome=findViewById(R.id.textView9);
 
@@ -87,15 +85,8 @@ public class MainDrawer extends AppCompatActivity
         monthlyOutlay=findViewById(R.id.textView12);
         yearlyOutlay=findViewById(R.id.textView16);
 
-        dailyBalance=findViewById(R.id.textView26);
-        dailyBalanceLabel=findViewById(R.id.textView19);
         monthlyBalance=findViewById(R.id.textView25);
         yearlyBalance=findViewById(R.id.textView24);
-
-        dailyIncomeLabel.setVisibility(View.INVISIBLE);
-        dailyBalanceLabel.setVisibility(View.INVISIBLE);
-        dailyIncome.setVisibility(View.INVISIBLE);
-        dailyBalance.setVisibility(View.INVISIBLE);
 
         toShop=findViewById(R.id.textView28);
 
@@ -141,7 +132,6 @@ public class MainDrawer extends AppCompatActivity
 
         DecimalFormat df=new DecimalFormat("0.00");
 
-        dailyIncome.setText(df.format(user.getDailyIncome()));
         monthlyIncome.setText(df.format(user.getMonthlyIncome()));
         yearlyIncome.setText(df.format(user.getYearlyIncome()));
 
@@ -149,7 +139,6 @@ public class MainDrawer extends AppCompatActivity
         monthlyOutlay.setText(df.format(user.getMonthlyOutlay()));
         yearlyOutlay.setText(df.format(user.getYearlyOutlay()));
 
-        dailyBalance.setText(df.format(user.getDailyBalance()));
         monthlyBalance.setText(df.format(user.getMonthlyBalance()));
         yearlyBalance.setText(df.format(user.getYearlyBalance()));
 
@@ -233,95 +222,11 @@ public class MainDrawer extends AppCompatActivity
         else if (id == R.id.synchronise)
         {
             final User toSync= Methods.load(MainDrawer.this);
+            Methods.updateUser(toSync);
 
-            final AsyncHttpClient client = new AsyncHttpClient();
-            String url="https://balance-rest.herokuapp.com/api/users/"+toSync.ID;
-
-
-            client.get(url, new JsonHttpResponseHandler()
-            {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                    try {
-                        Log.d("MainDrawerGet",response.toString());
-
-                        String id=response.getString("_id");
-                        String Email=response.getString("email");
-                        String Password=response.getString("password");
-
-                        String rawData= response.getString("data");
-                        Gson gson = new Gson();
-                        UserData data = gson.fromJson(rawData, UserData.class);
-
-
-
-                        User fromBase = new User(id,Email,Password,data);
-                        User fusion=new User(toSync.ID,toSync.email,toSync.password);
-
-
-                        fusion.ID=toSync.ID;
-                        fusion.email=toSync.email;
-                        fusion.password=toSync.password;
-
-                        File file = new File("User");
-                        Date lastModDate = new Date(file.lastModified());
-                        fusion.data.balanceActions=Methods.fuseActions(toSync.data.balanceActions, fromBase.data.balanceActions);
-                        fusion.data.shoppingLists=Methods.fuseLists(toSync.data.shoppingLists, fromBase.data.shoppingLists);
-                        fusion.data.categoriesOutlay=Methods.fuseStringLists(toSync.data.categoriesOutlay, fromBase.data.categoriesOutlay);
-                        fusion.data.categoriesIncome=Methods.fuseStringLists(toSync.data.categoriesIncome, fromBase.data.categoriesIncome);
-
-                        for(int i=0;i<fusion.data.balanceActions.size();i++)
-                        {
-                            if(fusion.data.balanceActions.get(i).amount<0 && !fusion.data.categoriesOutlay.contains(fusion.data.balanceActions.get(i).category)
-                                    || fusion.data.balanceActions.get(i).amount>0 && !fusion.data.categoriesIncome.contains(fusion.data.balanceActions.get(i).category))
-                                fusion.data.balanceActions.remove(i);
-                        }
-
-                        ArrayList<balanceAction> trashBin=Methods.loadTrashBin(MainDrawer.this);
-                        for(int i=0;i<fusion.data.balanceActions.size();i++)
-                        {
-                            balanceAction action= fusion.data.balanceActions.get(i);
-
-                            for(int j=0;j<trashBin.size();j++)
-                            {
-
-                                balanceAction trash=trashBin.get(j);
-                                if(action.amount==trash.amount && action.updatedAt.equals(trash.updatedAt) && action.date.equals(trash.date) && action.category.equals(trash.category) && action.info.equals(trash.info))
-                                {
-                                    fusion.data.balanceActions.remove(i);
-                                    break;
-                                }
-                            }
-                        }
-
-                        ArrayList<String> categoryTrashBin=Methods.loadCategoryTrashBin(MainDrawer.this);
-                        for(int i=0;i<categoryTrashBin.size();i++)
-                        {
-                            if(fusion.data.categoriesIncome.contains(categoryTrashBin.get(i)))fusion.data.categoriesIncome.remove(categoryTrashBin.get(i));
-                            if(fusion.data.categoriesOutlay.contains(categoryTrashBin.get(i)))fusion.data.categoriesOutlay.remove(categoryTrashBin.get(i));
-                        }
-                        deleteFile("catrash");
-
-                        Methods.updateUser(fusion);
-
-                        Methods.save(fusion,MainDrawer.this);
-
-                        deleteFile("trash");
-
-                        refreshMenu();
-
-                        Toast toast = Toast.makeText(getApplicationContext(),
-                                "Ви успішно синхронізували свої дані", Toast.LENGTH_SHORT);
-                        toast.show();
-
-                    } catch (Exception e) { e.printStackTrace(); }
-                }
-
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-
-                }
-            });
+            Toast toast = Toast.makeText(getApplicationContext(),
+                    "Ви успішно синхронізували свої дані", Toast.LENGTH_SHORT);
+            toast.show();
          }
         else if (id == R.id.logOut)
         {
@@ -331,7 +236,7 @@ public class MainDrawer extends AppCompatActivity
             deleteFile("catrash");
             finish();
         }
-        else if (id == R.id.groups)
+        /*else if (id == R.id.groups)
         {
             Intent intent = new Intent(MainDrawer.this, GroupActivity.class);
             startActivity(intent);
@@ -355,7 +260,7 @@ public class MainDrawer extends AppCompatActivity
         {
             Intent intent = new Intent(MainDrawer.this, Inbox.class);
             startActivity(intent);
-        }
+        }*/
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

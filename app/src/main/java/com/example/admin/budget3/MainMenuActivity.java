@@ -33,7 +33,6 @@ public class MainMenuActivity extends AppCompatActivity {
         openBalance=findViewById(R.id.button7);
         openShoppingLists=findViewById(R.id.button8);
 
-        dailyIncome=findViewById(R.id.textView7);
         monthlyIncome=findViewById(R.id.textView5);
         yearlyIncome=findViewById(R.id.textView9);
 
@@ -41,7 +40,6 @@ public class MainMenuActivity extends AppCompatActivity {
         monthlyOutlay=findViewById(R.id.textView12);
         yearlyOutlay=findViewById(R.id.textView16);
 
-        dailyBalance=findViewById(R.id.textView26);
         monthlyBalance=findViewById(R.id.textView25);
         yearlyBalance=findViewById(R.id.textView24);
 

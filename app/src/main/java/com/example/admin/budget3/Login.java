@@ -17,11 +17,14 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.DataAsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import org.bson.types.ObjectId;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import Classes.Group;
@@ -72,7 +75,7 @@ public class Login extends AppCompatActivity {
             public void onClick(View view) {
 
                 AsyncHttpClient client = new AsyncHttpClient();
-                String url="https://balance-rest.herokuapp.com/api/users";
+                String url="https://kursatch-api.herokuapp.com/api/users";
 
                 RequestParams params = new RequestParams();
                 params.add("Email", email.getText().toString().trim());
@@ -82,7 +85,32 @@ public class Login extends AppCompatActivity {
                 {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        Log.d("LoginGet","JSON array");
+                        try {
+
+                            String id=response.getString("_id");
+                            String Email=response.getString("email");
+                            String Password=response.getString("password");
+
+                            String rawData= response.getString("data");
+                            Gson gson = new Gson();
+                            UserData data = gson.fromJson(rawData, UserData.class);
+
+                            User retrievedUser =new User(id,email.getText().toString(),password.getText().toString(),data);
+                            Methods.save(retrievedUser,Login.this);
+
+                            group=new Group(new ObjectId(retrievedUser.ID));
+                            group.save(Login.this);
+
+                            Intent intent = new Intent(Login.this, MainDrawer.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
+                            finish();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Toast toast = Toast.makeText(getApplicationContext(),
+                                    "Користувача не знайдено", Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
                     }
 
                     @Override

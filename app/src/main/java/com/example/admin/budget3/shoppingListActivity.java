@@ -61,7 +61,7 @@ public class shoppingListActivity extends AppCompatActivity {
     Group group;
     ListView listView;
 
-    Button okButton, saveButton, shareButton;
+    Button okButton, saveButton;
     EditText textInput;
 
 
@@ -77,7 +77,6 @@ public class shoppingListActivity extends AppCompatActivity {
 
         okButton=findViewById(R.id.button3);
         saveButton=findViewById(R.id.button16);
-        shareButton=findViewById(R.id.button22);
         textInput=findViewById(R.id.editText6);
 
         user= Methods.load(this);
@@ -223,77 +222,6 @@ public class shoppingListActivity extends AppCompatActivity {
                         });
                 alert.show();
                 return true;
-            }
-        });
-
-        shareButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                LayoutInflater factory = LayoutInflater.from(shoppingListActivity.this);
-
-                final View textEntryView = factory.inflate(R.layout.share_layout, null);
-
-                final Spinner spinner = textEntryView.findViewById(R.id.spinner8);
-
-                ArrayList<String> valuesList = new ArrayList<String>(group.members.values());
-                final ArrayList<ObjectId> keysList = new ArrayList<ObjectId>(group.members.keySet());
-
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(shoppingListActivity.this,
-                        android.R.layout.simple_spinner_item, valuesList);
-
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinner.setAdapter(adapter);
-                spinner.setSelection(0);
-
-
-                final AlertDialog.Builder alert = new AlertDialog.Builder(shoppingListActivity.this);
-                alert.setTitle(
-                        "Виберіть користувача:").setView(
-                        textEntryView).setPositiveButton("Поділитись",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                final ObjectId sendToId = keysList.get(spinner.getSelectedItemPosition());
-
-                                AsyncHttpClient client = new AsyncHttpClient();
-                                String url="https://balance-rest.herokuapp.com/api/inbox/"+sendToId.toHexString();
-
-                                client.get(url, new JsonHttpResponseHandler()
-                                {
-                                    @Override
-                                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                                        Log.d("shoppingListGET","JSON object");
-                                        try {
-                                            String JSONOfLists = response.getString("data");
-                                            Gson gson = new Gson();
-                                            Type listType = new TypeToken< ArrayList<ShoppingList> >(){}.getType();
-                                            ArrayList<ShoppingList> data = gson.fromJson(JSONOfLists, listType);
-                                            if(data==null) data = new ArrayList<>();
-                                            data.add(list);
-
-                                            Methods.updateShoppingList(data,sendToId.toHexString());
-
-                                        }catch (Exception ex){ex.printStackTrace();}
-
-                                    }
-
-                                    @Override
-                                    public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                                        Log.d("shoppingListGET", "JSON Array");
-                                    }
-
-                                    @Override
-                                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                                        super.onFailure(statusCode, headers, responseString, throwable);
-                                        ArrayList<ShoppingList> data = new ArrayList<>();
-                                        data.add(list);
-                                        Methods.postShoppingList(data,sendToId.toHexString());
-                                        Log.d("shoppingListGET","fail");
-                                    }
-
-                                });
-                            }
-                        });
-                alert.show();
             }
         });
     }
